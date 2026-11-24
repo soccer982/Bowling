@@ -1,0 +1,2976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alley Crew HQ — Bowling Dashboard</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&family=DM+Sans:wght@400;500;700;800&family=Shrikhand&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --retro-cream: #f4e7ce;
+      --retro-paper: #fff9ec;
+      --retro-card-alt: #f9efd9;
+      --retro-espresso: #2b1a10;
+      --retro-umber: #5c3a21;
+      --retro-muted: #6f523b;
+      --retro-orange: #d9531e;
+      --retro-mustard: #e39b18;
+      --retro-teal: #1d7874;
+      --retro-avocado: #3a7d44;
+      --retro-cherry: #b8292f;
+    }
+
+    body {
+      font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+      background-color: var(--retro-cream) !important;
+      background-image:
+        radial-gradient(rgba(92, 58, 33, 0.08) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(227, 155, 24, 0.08) 0%, rgba(244, 231, 206, 0) 280px);
+      background-size: 16px 16px, 100% 100%;
+      color: var(--retro-espresso) !important;
+    }
+
+    h1 {
+      font-family: 'Shrikhand', 'Bungee', cursive !important;
+      letter-spacing: 0.02em;
+      color: var(--retro-cherry) !important;
+      text-shadow: 1.5px 1.5px 0 #e39b18;
+    }
+
+    h2, h3 {
+      font-family: 'Bungee', 'DM Sans', sans-serif !important;
+      letter-spacing: 0.02em;
+      color: var(--retro-espresso) !important;
+    }
+
+    .retro-stripe {
+      height: 7px;
+      background: linear-gradient(90deg,
+        #b8292f 0%, #b8292f 25%,
+        #d9531e 25%, #d9531e 50%,
+        #e39b18 50%, #e39b18 75%,
+        #1d7874 75%, #1d7874 100%);
+    }
+
+    /* Header & Surface Remapping for 1970s Print Ad Look */
+    header {
+      background-color: var(--retro-paper) !important;
+      border-bottom: 3px solid var(--retro-espresso) !important;
+      box-shadow: 0 4px 0 rgba(43, 26, 16, 0.12);
+    }
+
+    .bg-slate-950, .bg-slate-950\/70, .bg-slate-950\/80 {
+      background-color: var(--retro-card-alt) !important;
+    }
+    #modalBackdrop {
+      background-color: rgba(43, 26, 16, 0.65) !important;
+    }
+    .bg-slate-900, .bg-slate-900\/95, .bg-slate-900\/70, .bg-slate-900\/60, .bg-slate-900\/40 {
+      background-color: var(--retro-paper) !important;
+    }
+    .bg-slate-800 {
+      background-color: #ead7b7 !important;
+    }
+
+    /* Crisp Retro Print Borders & Offset Shadows */
+    .rounded-2xl.border {
+      border: 2px solid var(--retro-espresso) !important;
+      box-shadow: 4px 4px 0 rgba(43, 26, 16, 0.85) !important;
+    }
+    .border-slate-800, .border-slate-800\/80, .border-slate-700, .border-slate-900 {
+      border-color: #bfa07a !important;
+    }
+    .divide-slate-800\/70 > :not([hidden]) ~ :not([hidden]) {
+      border-color: #d8c29d !important;
+    }
+
+    /* Typography Contrast on Vintage Cream */
+    .text-white, .text-slate-100, .text-slate-200 {
+      color: var(--retro-espresso) !important;
+    }
+    .text-slate-300 {
+      color: var(--retro-umber) !important;
+    }
+    .text-slate-400, .text-slate-500 {
+      color: var(--retro-muted) !important;
+    }
+    .text-amber-400, .text-amber-300 {
+      color: var(--retro-orange) !important;
+    }
+    .text-emerald-400, .text-emerald-300 {
+      color: var(--retro-avocado) !important;
+    }
+    .text-sky-400, .text-sky-300 {
+      color: var(--retro-teal) !important;
+    }
+    .text-rose-400, .text-rose-300 {
+      color: var(--retro-cherry) !important;
+    }
+    .text-violet-400, .text-violet-300 {
+      color: #7c3f58 !important;
+    }
+
+    /* Retro Colored Badges, Pills & Active Buttons */
+    .bg-amber-500 {
+      background-color: var(--retro-orange) !important;
+      color: #fff9ec !important;
+      border-color: var(--retro-espresso) !important;
+    }
+    .bg-amber-500:hover {
+      background-color: #c24614 !important;
+    }
+    .bg-amber-500\/15, .bg-amber-500\/10, .bg-amber-500\/20 {
+      background-color: rgba(227, 155, 24, 0.22) !important;
+    }
+    .border-amber-500, .border-amber-500\/40, .border-amber-500\/30 {
+      border-color: var(--retro-orange) !important;
+    }
+
+    .bg-emerald-500 {
+      background-color: var(--retro-avocado) !important;
+      color: #fff9ec !important;
+    }
+    .bg-emerald-500:hover {
+      background-color: #2f6838 !important;
+    }
+    .bg-emerald-950\/15, .bg-emerald-950\/20, .bg-emerald-950\/25, .bg-emerald-950\/30, .bg-emerald-950\/40, .bg-emerald-500\/15, .bg-emerald-500\/20 {
+      background-color: rgba(58, 125, 68, 0.14) !important;
+    }
+
+    .bg-sky-500 {
+      background-color: var(--retro-teal) !important;
+      color: #fff9ec !important;
+    }
+    .bg-sky-950\/20, .bg-sky-950\/25, .bg-sky-950\/30, .bg-sky-950\/40, .bg-sky-500\/10, .bg-sky-500\/15, .bg-sky-500\/20 {
+      background-color: rgba(29, 120, 116, 0.14) !important;
+    }
+
+    .bg-rose-500 {
+      background-color: var(--retro-cherry) !important;
+      color: #fff9ec !important;
+    }
+    .bg-rose-950\/10, .bg-rose-950\/40, .bg-rose-950\/50, .bg-rose-950\/60, .bg-rose-950\/30 {
+      background-color: rgba(184, 41, 47, 0.12) !important;
+    }
+
+    /* Fix contrast on dark-text-on-solid-button classes */
+    .text-slate-950 {
+      color: #fff9ec !important;
+    }
+
+    /* Form Inputs */
+    input, select, textarea {
+      background-color: #fffdf7 !important;
+      color: var(--retro-espresso) !important;
+      border-color: #8c6a4a !important;
+    }
+
+    /* Retro Pin Styling (White pin with classic red neck stripe!) */
+    [data-pin-tap] {
+      background: linear-gradient(180deg, #fffdf7 0%, #fffdf7 22%, #b8292f 22%, #b8292f 34%, #fffdf7 34%, #fffdf7 100%) !important;
+      color: var(--retro-espresso) !important;
+      border: 2px solid var(--retro-espresso) !important;
+      box-shadow: 1.5px 1.5px 0 rgba(43, 26, 16, 0.5);
+    }
+    [data-pin-tap].bg-amber-500 {
+      background: var(--retro-orange) !important;
+      color: #fff9ec !important;
+    }
+
+    /* Nav Tabs */
+    .nav-btn {
+      border: 2px solid transparent;
+      text-transform: uppercase;
+      font-size: 11px !important;
+      letter-spacing: 0.04em;
+    }
+    .nav-btn:hover {
+      background-color: #ead7b7 !important;
+      border-color: #8c6a4a;
+    }
+    .nav-btn[aria-selected="true"] {
+      background-color: var(--retro-orange) !important;
+      color: #fff9ec !important;
+      border: 2px solid var(--retro-espresso) !important;
+      box-shadow: 2px 2px 0 var(--retro-espresso);
+      font-weight: 800;
+    }
+
+    /* Toast */
+    #toast {
+      background-color: var(--retro-espresso) !important;
+      color: #f4e7ce !important;
+      border: 2px solid var(--retro-mustard) !important;
+    }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+    ::-webkit-scrollbar { width: 7px; height: 7px; }
+    ::-webkit-scrollbar-track { background: #ead7b7; }
+    ::-webkit-scrollbar-thumb { background: #8c6a4a; border-radius: 4px; }
+
+    /* Bottom Mobile Nav Bar */
+    #mobileBottomNav {
+      display: none;
+      background-color: var(--retro-paper);
+      border-top: 3px solid var(--retro-espresso);
+      box-shadow: 0 -3px 10px rgba(43, 26, 16, 0.14);
+    }
+    .mnav-btn {
+      color: var(--retro-umber);
+      transition: all 0.15s ease;
+    }
+    .mnav-btn[aria-selected="true"] {
+      background-color: var(--retro-orange);
+      color: #fff9ec !important;
+      border: 2px solid var(--retro-espresso);
+      box-shadow: 1.5px 1.5px 0 var(--retro-espresso);
+    }
+
+    /* Automatic Mobile Layout on Phone Viewports */
+    @media (max-width: 640px) {
+      #desktopNav { display: none !important; }
+      #mobileBottomNav { display: grid !important; }
+      main { padding-bottom: 5.5rem !important; }
+      header h1 { font-size: 1.15rem !important; }
+      #calendarGrid button { height: 2.75rem !important; }
+    }
+
+    /* Explicit Mobile View Toggle (works on desktop/iPad preview too!) */
+    body.mobile-view {
+      max-width: 430px;
+      margin: 0 auto;
+      border-left: 3px solid var(--retro-espresso);
+      border-right: 3px solid var(--retro-espresso);
+      box-shadow: 0 0 0 9999px rgba(43, 26, 16, 0.12);
+      min-height: 100vh;
+    }
+    body.mobile-view #desktopNav { display: none !important; }
+    body.mobile-view #mobileBottomNav {
+      display: grid !important;
+      max-width: 424px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    body.mobile-view main {
+      padding: 0.9rem 0.75rem 5.5rem 0.75rem !important;
+    }
+    body.mobile-view .lg\:grid-cols-3,
+    body.mobile-view .md\:grid-cols-2,
+    body.mobile-view .sm\:grid-cols-3,
+    body.mobile-view .sm\:grid-cols-2,
+    body.mobile-view .lg\:grid-cols-5 {
+      grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+    }
+    body.mobile-view .lg\:col-span-2 {
+      grid-column: span 1 / span 1 !important;
+    }
+    body.mobile-view .sm\:flex-row {
+      flex-direction: column !important;
+      align-items: stretch !important;
+    }
+    body.mobile-view .sm\:grid-cols-11 {
+      grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+    }
+    body.mobile-view .sm\:grid-cols-10 {
+      grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    }
+    body.mobile-view [data-keypad-val] {
+      padding-top: 0.75rem !important;
+      padding-bottom: 0.75rem !important;
+      font-size: 1rem !important;
+    }
+    body.mobile-view #exportBtn,
+    body.mobile-view #importBtn,
+    body.mobile-view #resetBtn {
+      display: none !important;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100 antialiased">
+
+  <!-- Toast -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 hidden max-w-sm rounded-xl border border-amber-500/40 bg-slate-900 px-4 py-3 text-sm font-medium text-amber-200 shadow-2xl"></div>
+
+  <!-- General Modal (Register, Budget PIN, Export/Import/Reset) -->
+  <div id="modalBackdrop" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm">
+    <div class="w-full max-w-md rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-2xl">
+      <h3 id="modalTitle" class="text-lg font-bold text-white">Modal</h3>
+      <p id="modalBody" class="mt-1.5 text-sm text-slate-300"></p>
+      <div id="modalCustomContent" class="mt-4"></div>
+      <div class="mt-5 flex justify-end gap-2.5">
+        <button id="modalCancelBtn" type="button" class="rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-medium text-slate-200 hover:bg-slate-700">Cancel</button>
+        <button id="modalConfirmBtn" type="button" class="rounded-lg bg-amber-500 px-4 py-2 text-sm font-bold text-slate-950 hover:bg-amber-400">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Compact App Header -->
+  <header class="sticky top-0 z-30 border-b border-slate-800 bg-slate-900/95 backdrop-blur">
+    <div class="retro-stripe"></div>
+    <div class="mx-auto max-w-5xl px-4 py-3 sm:px-6">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-3">
+          <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 border-[#2b1a10] bg-[#e39b18] shadow-[2px_2px_0_#2b1a10]" aria-hidden="true">
+            <svg viewBox="0 0 48 48" class="h-8 w-8">
+              <circle cx="24" cy="24" r="21" fill="#fff9ec" stroke="#2b1a10" stroke-width="2"/>
+              <path d="M24 7 C21 7 20 10 21 13 C18 16 17 22 18 32 C18.5 36 20 39 24 39 C28 39 29.5 36 30 32 C31 22 30 16 27 13 C28 10 27 7 24 7 Z" fill="#fffdf7" stroke="#2b1a10" stroke-width="2"/>
+              <rect x="20.4" y="13.5" width="7.2" height="2.2" fill="#b8292f"/>
+              <rect x="19.6" y="17" width="8.8" height="2.2" fill="#b8292f"/>
+              <circle cx="33" cy="31" r="7.5" fill="#1d7874" stroke="#2b1a10" stroke-width="2"/>
+              <circle cx="31.5" cy="28.5" r="1.1" fill="#fff9ec"/>
+              <circle cx="34.5" cy="28.5" r="1.1" fill="#fff9ec"/>
+              <circle cx="33" cy="31.2" r="1.1" fill="#fff9ec"/>
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-xl font-extrabold tracking-tight sm:text-2xl leading-tight">Alley Crew Lanes</h1>
+            <p id="headerSubtitle" class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Next Outing · Medford Lanes</p>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-1.5">
+          <button id="viewModeToggleBtn" type="button" title="Switch between Desktop and Mobile phone layout" class="rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1.5 text-xs font-bold text-slate-200 hover:bg-slate-700">📱 Mobile</button>
+          <span id="syncStatusPill" class="rounded-lg border border-slate-700 bg-slate-800 px-2 py-1 text-[10px] font-bold text-slate-300">Local Mode</span>
+          <button id="openSignInBtn" type="button" class="rounded-lg border border-sky-500/40 bg-sky-500/10 px-2.5 py-1.5 text-xs font-bold text-sky-300 hover:bg-sky-500/20">Sign In (Email)</button>
+          <button id="openRegisterBtn" type="button" class="rounded-lg bg-emerald-500/15 border border-emerald-500/40 px-2.5 py-1.5 text-xs font-bold text-emerald-300 hover:bg-emerald-500/25">+ Register / Add Kid</button>
+          <button id="openAdminBudgetBtn" type="button" title="Private Organizer Budget (PIN Protected)" class="rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1.5 text-xs font-medium text-slate-300 hover:bg-slate-700">🔒</button>
+          <button id="exportBtn" type="button" class="rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1.5 text-xs font-medium text-slate-300 hover:bg-slate-700">Backup</button>
+          <button id="importBtn" type="button" class="hidden sm:inline-block rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1.5 text-xs font-medium text-slate-300 hover:bg-slate-700">Restore</button>
+          <button id="resetBtn" type="button" class="hidden sm:inline-block rounded-lg border border-rose-800/50 bg-rose-950/40 px-2.5 py-1.5 text-xs font-medium text-rose-300 hover:bg-rose-900/50">Reset</button>
+        </div>
+      </div>
+
+      <!-- Screen Switcher (Distinct App Screens, No Long Scroll) -->
+      <nav id="desktopNav" class="mt-3 flex gap-1.5 overflow-x-auto pb-0.5" role="tablist" aria-label="App Screens">
+        <button type="button" role="tab" aria-selected="true" data-screen="checkin" class="nav-btn whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-300 hover:bg-slate-800 sm:text-sm">Check-In &amp; Dates</button>
+        <button type="button" role="tab" aria-selected="false" data-screen="play" class="nav-btn whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-300 hover:bg-slate-800 sm:text-sm">Bowling Screen</button>
+        <button type="button" role="tab" aria-selected="false" data-screen="games" class="nav-btn whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-300 hover:bg-slate-800 sm:text-sm">Game Styles</button>
+        <button type="button" role="tab" aria-selected="false" data-screen="standings" class="nav-btn whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-300 hover:bg-slate-800 sm:text-sm">Standings</button>
+        <button type="button" role="tab" aria-selected="false" data-screen="wedges" class="nav-btn whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-300 hover:bg-slate-800 sm:text-sm">Wedges &amp; Stars</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-5xl px-4 py-5 sm:px-6">
+
+    <!-- ========================================================= -->
+    <!-- SCREEN 1: CHECK-IN, UPCOMING DATES, GAME VOTE & MATCHUPS  -->
+    <!-- ========================================================= -->
+    <section id="screen-checkin" class="screen active space-y-5">
+
+      <!-- Monthly Availability Calendar & Medford Lanes Cost Estimator -->
+      <div class="rounded-2xl border border-slate-800 bg-slate-900 p-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-base font-bold text-white">1. Monthly Availability Calendar — Medford Lanes</h2>
+            <p class="text-xs text-slate-400">Pick a date on the calendar to mark availability, RSVP, and see Medford Lanes per-person cost.</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <label for="setTimeSelect" class="text-xs text-slate-400">Set Time:</label>
+            <select id="setTimeSelect" class="rounded-lg border border-slate-700 bg-slate-950 px-2.5 py-1 text-xs font-bold text-white">
+              <option value="16:00">4:00 PM (Before 6 PM)</option>
+              <option value="18:30">6:30 PM (2 hrs)</option>
+              <option value="19:00">7:00 PM (2 hrs)</option>
+              <option value="19:30">7:30 PM (2 hrs)</option>
+              <option value="15:00">3:00 PM (Sun Matinee)</option>
+            </select>
+            <div class="inline-flex rounded-lg border border-slate-700 bg-slate-950 p-0.5 text-[11px] font-bold">
+              <button type="button" id="lanesAutoBtn" class="rounded px-2 py-1">Auto</button>
+              <button type="button" id="lanes1Btn" class="rounded px-2 py-1">1 Lane</button>
+              <button type="button" id="lanes2Btn" class="rounded px-2 py-1">2 Lanes</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <!-- Calendar Grid (2 cols) -->
+          <div class="lg:col-span-2 rounded-xl border border-slate-800 bg-slate-950 p-3">
+            <div class="flex items-center justify-between mb-2.5">
+              <button type="button" id="calPrevBtn" class="rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-1 text-xs font-bold text-slate-200 hover:bg-slate-800">← Prev</button>
+              <div id="calMonthLabel" class="text-sm font-extrabold text-white">December 2026</div>
+              <button type="button" id="calNextBtn" class="rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-1 text-xs font-bold text-slate-200 hover:bg-slate-800">Next →</button>
+            </div>
+            <div class="grid grid-cols-7 gap-1 text-center text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">
+              <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+            </div>
+            <div id="calendarGrid" class="grid grid-cols-7 gap-1"></div>
+            <div class="mt-2.5 flex flex-wrap gap-3 text-[10px] text-slate-400">
+              <span><span class="inline-block h-2 w-2 rounded-full bg-emerald-400 mr-1"></span>$59.99/ln (Weekday &lt;6 PM)</span>
+              <span><span class="inline-block h-2 w-2 rounded-full bg-amber-400 mr-1"></span>$69.99/ln (Weeknight 6+ PM / Sun)</span>
+              <span><span class="inline-block h-2 w-2 rounded-full bg-sky-400 mr-1"></span>$79.99/ln (Sat)</span>
+              <span><span class="inline-block h-2 w-2 rounded-full bg-slate-600 mr-1"></span>Closed (Tue)</span>
+            </div>
+          </div>
+
+          <!-- Selected Date & Medford Lanes Cost Card (1 col) -->
+          <div id="selectedDateInfoCard" class="rounded-xl border border-slate-800 bg-slate-950 p-4 flex flex-col justify-between space-y-3"></div>
+        </div>
+      </div>
+
+      <!-- RSVP + Game Vote + Kids/Guests -->
+      <div class="grid grid-cols-1 gap-5 lg:grid-cols-3">
+        <!-- Left 2 cols: Who's Coming -->
+        <div class="lg:col-span-2 rounded-2xl border border-slate-800 bg-slate-900 p-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 class="text-base font-bold text-white">2. Roster RSVP &amp; Game Vote</h2>
+              <p id="rsvpCountLine" class="text-xs text-slate-400">6 Adults · 0 Kids checked IN</p>
+            </div>
+            <div class="flex gap-2">
+              <button id="addKidQuickBtn" type="button" class="rounded-lg border border-sky-500/40 bg-sky-500/10 px-2.5 py-1 text-xs font-bold text-sky-300 hover:bg-sky-500/20">+ Add Kid / Guest</button>
+              <button id="allInBtn" type="button" class="rounded-lg border border-emerald-600/50 bg-emerald-950/40 px-2.5 py-1 text-xs font-semibold text-emerald-300 hover:bg-emerald-900/50">All In</button>
+            </div>
+          </div>
+          <div id="rsvpList" class="mt-3 space-y-2"></div>
+        </div>
+
+        <!-- Right col: Top 3 Voted Games & Launch -->
+        <div class="rounded-2xl border border-slate-800 bg-slate-900 p-4 flex flex-col justify-between space-y-4">
+          <div>
+            <h2 class="text-base font-bold text-white">3. Top 3 Voted Games</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Pick tonight's active game from the crew's top votes (switch anytime if kids join!).</p>
+            <div id="topThreeGames" class="mt-3 space-y-2"></div>
+          </div>
+
+          <div class="border-t border-slate-800 pt-3 space-y-2.5">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-slate-400">Balanced Pairings</span>
+              <button id="shuffleMatchupsBtn" type="button" class="font-semibold text-amber-400 hover:text-amber-300">↻ Reshuffle</button>
+            </div>
+            <div id="miniMatchupsPreview" class="space-y-1.5 text-xs"></div>
+            <button id="launchPlayBtn" type="button" class="w-full rounded-xl bg-amber-500 py-2.5 text-sm font-extrabold text-slate-950 shadow-lg shadow-amber-500/20 hover:bg-amber-400">
+              Start Bowling Screen →
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- SCREEN 2: FOCUSED BOWLING SCREEN (TURN-BY-TURN + SKIP)    -->
+    <!-- ========================================================= -->
+    <section id="screen-play" class="screen space-y-4">
+
+      <!-- Active Game & Frame Header -->
+      <div class="rounded-2xl border border-slate-800 bg-slate-900 p-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span id="playGameBadge" class="rounded-full bg-amber-500/15 border border-amber-500/30 px-2.5 py-0.5 text-xs font-bold text-amber-400">Scotch Doubles</span>
+              <span id="playFrameBadge" class="rounded-full bg-slate-800 px-2.5 py-0.5 text-xs font-bold text-white">Frame 1 of 10</span>
+            </div>
+            <p id="playGameRuleLine" class="mt-1 text-xs text-slate-400">Teammates alternate frames (Odd: P1 · Even: P2) across all 10 frames.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <select id="playGameSelect" class="rounded-lg border border-slate-700 bg-slate-950 px-2.5 py-1.5 text-xs font-semibold text-white"></select>
+            <button id="newGameBtn" type="button" class="rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1.5 text-xs font-semibold text-slate-200 hover:bg-slate-700">New Game</button>
+          </div>
+        </div>
+
+        <!-- Horizontal Rotation Queue (Click any bowler to view/score or inspect) -->
+        <div id="rotationQueueBar" class="mt-3 flex gap-2 overflow-x-auto pb-1"></div>
+      </div>
+
+      <!-- Skipped / Away Bowler Return Prompt ("Is Curtis back yet?") -->
+      <div id="returnPromptBanner" class="hidden rounded-2xl border border-sky-500/50 bg-sky-950/40 p-4">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-sky-400">Skipped Bowler Check-In</div>
+            <div id="returnPromptText" class="mt-0.5 text-sm font-bold text-white">Is Curtis back yet to bowl Frame 1?</div>
+          </div>
+          <div class="flex gap-2">
+            <button id="returnYesBtn" type="button" class="rounded-lg bg-emerald-500 px-3.5 py-1.5 text-xs font-extrabold text-slate-950 hover:bg-emerald-400">Yes — Bowl Now</button>
+            <button id="returnNoBtn" type="button" class="rounded-lg border border-slate-600 bg-slate-800 px-3.5 py-1.5 text-xs font-semibold text-slate-200 hover:bg-slate-700">Still Away — Continue</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Focused Active Bowler Scorecard -->
+      <div id="activeBowlerCard" class="rounded-2xl border border-slate-800 bg-slate-900 p-4 sm:p-5 space-y-4"></div>
+
+      <!-- Bottom Action Bar & Scoring Key -->
+      <div class="rounded-2xl border border-slate-800 bg-slate-900 p-4 space-y-3">
+        <div class="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-slate-400">
+          <span><strong class="text-white">0–9:</strong> Pins knocked down</span>
+          <span><strong class="text-emerald-400">X:</strong> Strike (all 10 on Ball 1)</span>
+          <span><strong class="text-violet-400">/:</strong> Spare (cleared on Ball 2)</span>
+          <span><strong class="text-rose-400">- / 0:</strong> Gutter ball</span>
+          <span><strong class="text-sky-400">Split:</strong> Non-adjacent pins left after Ball 1</span>
+        </div>
+        <div class="flex flex-col gap-2 border-t border-slate-800 pt-3 sm:flex-row sm:items-center sm:justify-between">
+          <span class="text-xs text-slate-400">When all 10 frames are done, save the game to update Standings &amp; automatically award the 5 nightly Wedge Stars.</span>
+          <button id="saveGameScoresBtn" type="button" class="rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-extrabold text-slate-950 hover:bg-emerald-400">
+            Finish &amp; Save Game
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- SCREEN 3: GAME STYLES & INDIVIDUAL CHALLENGES             -->
+    <!-- ========================================================= -->
+    <section id="screen-games" class="screen space-y-5">
+      <div class="rounded-2xl border border-slate-800 bg-slate-900 p-4 sm:p-5">
+        <h2 class="text-lg font-bold text-white">Playable Game Styles (All 10 Frames)</h2>
+        <p class="text-xs text-slate-400 mt-0.5">Every game below has clear rules from Frame 1 to Frame 10—no awkward or impossible pin tricks. Tap <strong>Select for Tonight</strong> to switch immediately.</p>
+        <div id="gameStylesGrid" class="mt-4 grid grid-cols-1 gap-3.5 md:grid-cols-2"></div>
+      </div>
+
+      <div class="rounded-2xl border border-slate-800 bg-slate-900 p-4 sm:p-5">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-lg font-bold text-white">Individual Bowler Challenges</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Realistic personal goals bowlers can chase alongside tonight's main game.</p>
+          </div>
+          <button id="shuffleChallengesBtn" type="button" class="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-1.5 text-xs font-bold text-amber-300 hover:bg-amber-500/20">Deal New Challenges</button>
+        </div>
+        <div id="challengesGrid" class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"></div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- SCREEN 4: STANDINGS & BOWLER DETAIL PROFILE               -->
+    <!-- ========================================================= -->
+    <section id="screen-standings" class="screen space-y-5">
+      <div class="rounded-2xl border border-slate-800 bg-slate-900 p-4 sm:p-5">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 class="text-lg font-bold text-white">Crew Standings &amp; Averages</h2>
+            <p class="text-xs text-slate-400">Tap any bowler's name to open their full profile, wedge wheel, and game log.</p>
+          </div>
+        </div>
+        <div id="hcpShiftBanner" class="mt-3 hidden rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-xs"></div>
+        <div class="mt-4 overflow-x-auto">
+          <table class="w-full min-w-[560px] text-left text-sm">
+            <thead>
+              <tr class="border-b border-slate-800 text-xs uppercase tracking-wider text-slate-400">
+                <th class="pb-2.5 pr-3">Rank</th>
+                <th class="pb-2.5 pr-3">Bowler</th>
+                <th class="pb-2.5 pr-3 text-right">Games</th>
+                <th class="pb-2.5 pr-3 text-right">Avg</th>
+                <th class="pb-2.5 pr-3 text-right">Hcp</th>
+                <th class="pb-2.5 pr-3 text-right">High</th>
+                <th class="pb-2.5 text-right">W-L</th>
+              </tr>
+            </thead>
+            <tbody id="standingsBody" class="divide-y divide-slate-800/70"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border border-slate-800 bg-slate-900 p-4 sm:p-5">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 class="text-base font-bold text-white">Team Pairs &amp; Group Handicaps</h2>
+            <p class="text-xs text-slate-400">Stored team raw scores and dynamically calculated group handicaps for doubles pairs.</p>
+          </div>
+        </div>
+        <div id="teamStandingsWrap" class="mt-3 overflow-x-auto"></div>
+      </div>
+
+      <div class="rounded-2xl border border-slate-800 bg-slate-900 p-4 sm:p-5">
+        <h2 class="text-base font-bold text-white">Score Trend (Recent Games)</h2>
+        <div class="relative mt-3 h-64 w-full">
+          <canvas id="trendChart"></canvas>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border border-slate-800 bg-slate-900 p-4 sm:p-5">
+        <h2 class="text-base font-bold text-white">Recent Outing Log</h2>
+        <div id="historyList" class="mt-3 space-y-2.5"></div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- SCREEN 4B: DEDICATED BOWLER PROFILE SCREEN (CLICK NAME)   -->
+    <!-- ========================================================= -->
+    <section id="screen-player" class="screen space-y-5">
+      <div class="flex items-center justify-between">
+        <button id="backFromPlayerBtn" type="button" class="rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-bold text-slate-200 hover:bg-slate-700">← Back</button>
+        <button id="jumpToBowlBtn" type="button" class="rounded-lg bg-amber-500 px-3.5 py-1.5 text-xs font-extrabold text-slate-950 hover:bg-amber-400">Open on Bowling Screen →</button>
+      </div>
+      <div id="playerProfileContent" class="space-y-4"></div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- SCREEN 5: 5-STAR WEDGES & TROPHIES (AUTO-TRACKED ONLY)    -->
+    <!-- ========================================================= -->
+    <section id="screen-wedges" class="screen space-y-5">
+      <div class="rounded-2xl border border-slate-800 bg-slate-900 p-4 sm:p-5">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 class="text-lg font-bold text-white">5-Star Wedge Trophy Wheel</h2>
+            <p class="text-xs text-slate-400">Automatically awarded whenever a game is saved on the Bowling Screen. Reach 5★ in a category to unlock its title &amp; perk.</p>
+          </div>
+          <div class="rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-2">
+            <div class="text-[10px] font-bold uppercase tracking-wider text-amber-400">Reigning Nightly Champ</div>
+            <div id="reigningChampDisplay" class="text-sm font-extrabold text-white">Brian</div>
+          </div>
+        </div>
+        <div id="wedgeLegendGrid" class="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-5"></div>
+      </div>
+
+      <div id="wedgeCardsGrid" class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"></div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- HIDDEN ADMIN SCREEN: PRIVATE BUDGET TRACKER (CURTIS ONLY) -->
+    <!-- ========================================================= -->
+    <section id="screen-budget" class="screen space-y-5">
+      <div class="rounded-2xl border border-amber-500/40 bg-slate-900 p-4 sm:p-5">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <div class="text-[11px] font-bold uppercase tracking-wider text-amber-400">Admin Panel (Curtis) · Hidden From Group</div>
+            <h2 class="text-lg font-bold text-white">League Settings &amp; Personal Budget</h2>
+            <p class="text-xs text-slate-400">Manage handicap rules for the crew and track your personal lane budget privately.</p>
+          </div>
+          <button id="lockBudgetBtn" type="button" class="rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-bold text-slate-200 hover:bg-slate-700">🔒 Lock &amp; Exit</button>
+        </div>
+
+        <!-- Admin League Settings -->
+        <div class="mt-4 rounded-xl border border-slate-800 bg-slate-950 p-3.5 space-y-3">
+          <div>
+            <div class="text-xs font-bold text-white">Dynamic Handicap Engine</div>
+            <div class="text-[11px] text-slate-400">Recalculates automatically after every saved game and rebalances next night's pairings.</div>
+          </div>
+          <div class="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+            <div>
+              <label for="hcpBasis" class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Basis Score</label>
+              <select id="hcpBasis" class="w-full rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-1.5 text-xs font-bold text-white">
+                <option value="200">200 Basis</option>
+                <option value="210">210 Basis</option>
+                <option value="220">220 Basis</option>
+                <option value="0">Scratch (0)</option>
+              </select>
+            </div>
+            <div>
+              <label for="hcpPctSelect" class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Handicap %</label>
+              <select id="hcpPctSelect" class="w-full rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-1.5 text-xs font-bold text-white">
+                <option value="0.8">80% (Standard)</option>
+                <option value="0.85">85%</option>
+                <option value="0.9">90% (Closer Matches)</option>
+                <option value="1">100% (Full Parity)</option>
+              </select>
+            </div>
+            <div>
+              <label for="hcpWindowSelect" class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Average Window</label>
+              <select id="hcpWindowSelect" class="w-full rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-1.5 text-xs font-bold text-white">
+                <option value="season">All-Time Season Avg</option>
+                <option value="rolling6">Rolling Last 6 Games</option>
+              </select>
+            </div>
+          </div>
+          <div class="border-t border-slate-800 pt-3">
+            <label for="webAppUrlInput" class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Deployed Web App / Google Site URL (for Personal Bowler Links)</label>
+            <input id="webAppUrlInput" type="url" placeholder="https://script.google.com/macros/s/.../exec" class="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs text-white" />
+            <div id="adminPersonalLinksList" class="mt-2.5 flex flex-wrap gap-1.5"></div>
+          </div>
+        </div>
+
+        <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <div class="rounded-xl border border-slate-800 bg-slate-950 p-3.5">
+            <div class="text-xs text-slate-400">Monthly Budget Cap</div>
+            <input id="budgetCapInput" type="number" min="0" step="10" class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-1.5 text-base font-bold text-white" />
+          </div>
+          <div class="rounded-xl border border-slate-800 bg-slate-950 p-3.5">
+            <div class="text-xs text-slate-400">Total Logged Spend</div>
+            <div id="budgetSpentTotal" class="mt-1.5 text-xl font-extrabold text-amber-400">$0</div>
+          </div>
+          <div class="rounded-xl border border-slate-800 bg-slate-950 p-3.5">
+            <div class="text-xs text-slate-400">Remaining This Month</div>
+            <div id="budgetRemaining" class="mt-1.5 text-xl font-extrabold text-emerald-400">$0</div>
+          </div>
+        </div>
+
+        <!-- Add Expense Form -->
+        <div class="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-4">
+          <input id="expDate" type="date" class="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white" />
+          <input id="expDesc" type="text" placeholder="e.g., 2 lanes + shoes + snacks" class="sm:col-span-2 rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white" />
+          <div class="flex gap-2">
+            <input id="expAmount" type="number" min="0" step="1" placeholder="$" class="w-24 rounded-lg border border-slate-700 bg-slate-950 px-2.5 py-2 text-xs font-bold text-white" />
+            <button id="addExpenseBtn" type="button" class="flex-1 rounded-lg bg-amber-500 px-3 py-2 text-xs font-extrabold text-slate-950 hover:bg-amber-400">Add</button>
+          </div>
+        </div>
+
+        <div id="budgetExpensesList" class="mt-4 space-y-2"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Mobile Bottom Navigation Bar (Auto on phones & in Mobile View) -->
+  <nav id="mobileBottomNav" class="fixed bottom-0 left-0 right-0 z-40 grid-cols-5 gap-1 px-2 py-2" role="tablist" aria-label="Mobile Navigation">
+    <button type="button" role="tab" aria-selected="true" data-screen="checkin" class="mnav-btn flex flex-col items-center justify-center rounded-xl py-1.5 text-[10px] font-extrabold">
+      <span class="text-sm leading-none">📅</span>
+      <span class="mt-0.5">Check-In</span>
+    </button>
+    <button type="button" role="tab" aria-selected="false" data-screen="play" class="mnav-btn flex flex-col items-center justify-center rounded-xl py-1.5 text-[10px] font-extrabold">
+      <span class="text-sm leading-none">🎳</span>
+      <span class="mt-0.5">Bowl</span>
+    </button>
+    <button type="button" role="tab" aria-selected="false" data-screen="games" class="mnav-btn flex flex-col items-center justify-center rounded-xl py-1.5 text-[10px] font-extrabold">
+      <span class="text-sm leading-none">🎯</span>
+      <span class="mt-0.5">Games</span>
+    </button>
+    <button type="button" role="tab" aria-selected="false" data-screen="standings" class="mnav-btn flex flex-col items-center justify-center rounded-xl py-1.5 text-[10px] font-extrabold">
+      <span class="text-sm leading-none">🏆</span>
+      <span class="mt-0.5">Stats</span>
+    </button>
+    <button type="button" role="tab" aria-selected="false" data-screen="wedges" class="mnav-btn flex flex-col items-center justify-center rounded-xl py-1.5 text-[10px] font-extrabold">
+      <span class="text-sm leading-none">★</span>
+      <span class="mt-0.5">Wedges</span>
+    </button>
+  </nav>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const STORAGE_KEY = 'alley_crew_bowling_v2';
+      // Populated automatically by Apps Script doGet(e) when ?player=<id> is in the URL
+      const SERVER_PLAYER_PARAM = '<?= typeof initialPlayer !== "undefined" ? initialPlayer : "" ?>';
+      const ADMIN_PIN = '1234';
+
+      const GAME_STYLES = [
+        {
+          id: 'scotch_doubles',
+          name: 'Scotch Doubles (Baker)',
+          short: 'Scotch Doubles',
+          kidFriendly: false,
+          summary: 'Paired teams alternate frames all game (Partner 1 bowls Odd frames 1,3,5,7,9; Partner 2 bowls Even frames 2,4,6,8,10). Balanced with handicaps so no pair gets blown out.',
+          mode: 'doubles'
+        },
+        {
+          id: 'classic_singles',
+          name: 'Handicapped Singles',
+          short: 'Singles',
+          kidFriendly: true,
+          summary: 'Everyone bowls their own 10 frames across 2 lanes. Handicaps (80% of basis) level the playing field for the nightly Overall Winner star.',
+          mode: 'singles'
+        },
+        {
+          id: 'no_tap_9',
+          name: '9-Pin No-Tap',
+          short: '9-Pin No-Tap',
+          kidFriendly: true,
+          summary: 'Knocking down 9 pins on your first ball counts as a full Strike (X) for all 10 frames! High-scoring, fast, and great when kids or casual bowlers join.',
+          mode: 'singles'
+        },
+        {
+          id: 'family_mix',
+          name: 'Family / Kids Mix',
+          short: 'Family Mix',
+          kidFriendly: true,
+          summary: 'Flexible open-lane rotation where adults and kids bowl together at their own pace (bumpers optional for kids) while still tracking individual frames and stars.',
+          mode: 'singles'
+        },
+        {
+          id: 'low_ball',
+          name: 'Low-Ball (Reverse)',
+          short: 'Low-Ball',
+          kidFriendly: false,
+          summary: 'Lowest score wins across all 10 frames—EXCEPT a gutter ball counts as a Strike (10)! You must hit at least 1 pin without knocking down the whole rack.',
+          mode: 'singles'
+        }
+      ];
+
+      const CHALLENGE_POOL = [
+        'Mark (Strike or Spare) in at least 3 frames',
+        'Zero gutter balls for the entire game',
+        'Beat your current scratch average by 10+ pins',
+        'Convert at least 2 spares in the game',
+        'Clean Finish: No open frames in Frames 8–10',
+        'Hit 7+ pins on at least six first balls',
+        'Back-to-back marks (any Strike/Spare combo)'
+      ];
+
+      const WEDGE_CATEGORIES = [
+        { id: 'overall', name: 'Overall Winner', short: 'Kingpin', color: '#e39b18', title: 'Grand Kingpin', perk: 'Picks next game format & lane' },
+        { id: 'strikes', name: 'Most Strikes', short: 'Strikes', color: '#3a7d44', title: 'Thunder Arm', perk: 'Gold badge & first-ball honors' },
+        { id: 'gutters', name: 'Gutter Ball Champ', short: 'Gutters', color: '#b8292f', title: 'Bumper VIP', perk: 'Controls lane music playlist' },
+        { id: 'splits',  name: 'Split Converter', short: 'Splits',  color: '#1d7874', title: 'Gap Closer', perk: 'Picks bonus crew challenge' },
+        { id: 'spares',  name: 'Spare Master', short: 'Spares',  color: '#d9531e', title: 'Mr. Reliable', perk: 'Immune from odd-man Ghost slot' }
+      ];
+
+      function createEmptyFrames() {
+        return Array.from({ length: 10 }, () => ({
+          b1: null, b2: null, b3: null,
+          b1Pins: [], b2Pins: [], b3Pins: [],
+          split: false
+        }));
+      }
+
+      function createDefaultState() {
+        return {
+          selectedDateId: '2026-12-03',
+          calYear: 2026,
+          calMonth: 11, // 0-indexed: 11 = December
+          setTime: '19:00',
+          lanesMode: 'auto', // 'auto' | '1' | '2'
+          lanesCount: 1,
+          activeGameId: 'scotch_doubles',
+          hcpBasis: 200,
+          hcpPct: 0.80,
+          hcpWindow: 'rolling6', // 'season' | 'rolling6'
+          lastHcpShifts: [], // [{ name, prevHcp, newHcp, delta }]
+          reigningChamp: 'Brian',
+          signedInMemberId: 'curtis',
+          adminMemberId: 'curtis',
+          webAppUrl: '', // Paste deployed Web App or Google Site URL in Admin Panel to generate personal links
+          remindersSentForDates: {},
+          activeScreen: 'checkin',
+          prevScreen: 'standings',
+          viewingPlayerId: 'curtis',
+          // Live play state
+          playFrameIdx: 0, // 0..9
+          activeBowlerId: 'brian',
+          skippedIds: [], // bowlers currently away (e.g. bathroom)
+          pendingReturnCheckId: null, // prompts "Is X back yet?"
+          entryMode: 'keypad', // 'keypad' | 'pins' | 'screen'
+          currentBall: 0, // 0, 1, or 2 (10th frame)
+          members: [
+            { id: 'paul',   name: 'Paul',   email: '', remind48h: false, tag: '', isKid: false, rsvps: { '2026-12-03': 'in', '2026-12-10': 'in', '2026-12-17': 'pending' }, vote: 'scotch_doubles', challenge: CHALLENGE_POOL[0], games: 8, totalPins: 1240, highGame: 184, wins: 5, losses: 3, history: [148, 152, 161, 155, 168], wedges: { overall: 2, strikes: 3, gutters: 1, splits: 2, spares: 4 } },
+            { id: 'brian',  name: 'Brian',  email: '', remind48h: false, tag: '', isKid: false, rsvps: { '2026-12-03': 'in', '2026-12-10': 'in', '2026-12-17': 'in' },      vote: 'scotch_doubles', challenge: CHALLENGE_POOL[1], games: 8, totalPins: 1360, highGame: 198, wins: 5, losses: 3, history: [165, 172, 168, 178, 175], wedges: { overall: 4, strikes: 5, gutters: 0, splits: 2, spares: 3 } },
+            { id: 'joe',    name: 'Joe',    email: '', remind48h: false, tag: '', isKid: false, rsvps: { '2026-12-03': 'in', '2026-12-10': 'pending', '2026-12-17': 'in' }, vote: 'classic_singles', challenge: CHALLENGE_POOL[2], games: 8, totalPins: 1120, highGame: 166, wins: 4, losses: 4, history: [132, 141, 138, 145, 149], wedges: { overall: 1, strikes: 1, gutters: 3, splits: 4, spares: 2 } },
+            { id: 'mike',   name: 'Mike',   email: '', remind48h: false, tag: '', isKid: false, rsvps: { '2026-12-03': 'in', '2026-12-10': 'in', '2026-12-17': 'pending' }, vote: 'no_tap_9',        challenge: CHALLENGE_POOL[3], games: 8, totalPins: 1200, highGame: 175, wins: 4, losses: 4, history: [144, 149, 154, 150, 158], wedges: { overall: 2, strikes: 2, gutters: 1, splits: 1, spares: 4 } },
+            { id: 'curtis', name: 'Curtis', email: '', remind48h: false, tag: '', isKid: false, isAdmin: true, rsvps: { '2026-12-03': 'in', '2026-12-10': 'in', '2026-12-17': 'in' }, vote: 'scotch_doubles', challenge: CHALLENGE_POOL[4], games: 8, totalPins: 1160, highGame: 171, wins: 4, losses: 4, history: [139, 145, 151, 146, 152], wedges: { overall: 3, strikes: 2, gutters: 2, splits: 3, spares: 3 } }
+          ],
+          partnerHistory: [['paul', 'joe'], ['mike', 'curtis']],
+          teamStats: {
+            'brian|curtis': { label: 'Brian & Curtis', games: 1, totalPins: 164, highGame: 164, wins: 1, losses: 0, history: [164] },
+            'joe|paul':     { label: 'Joe & Paul',     games: 1, totalPins: 152, highGame: 152, wins: 0, losses: 1, history: [152] }
+          },
+          matchups: [],
+          liveScores: {}, // keyed by memberId -> { frames, manualTotal, manualStats, challengeDone }
+          sessionLogs: [
+            { date: '2026-11-09', game: 'Scotch Doubles', summary: 'Brian & Curtis edged Paul & Joe by 4 pins net. Champ: Brian.' },
+            { date: '2026-10-26', game: 'Handicapped Singles', summary: 'Curtis bowled 171 scratch (219 net) for the nightly win.' }
+          ],
+          privateBudget: {
+            monthlyCap: 120,
+            expenses: [
+              { id: 'e1', date: '2026-11-09', desc: 'My lane share + shoe rental', amount: 32 },
+              { id: 'e2', date: '2026-10-26', desc: 'My lane share + snacks', amount: 28 }
+            ]
+          }
+        };
+      }
+
+      function loadState() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && Array.isArray(parsed.members) && parsed.members.length > 0) {
+              if (!parsed.selectedDateId || !/^\d{4}-\d{2}-\d{2}$/.test(parsed.selectedDateId)) {
+                parsed.selectedDateId = '2026-12-03';
+                parsed.calYear = 2026;
+                parsed.calMonth = 11;
+              }
+              if (!parsed.setTime) parsed.setTime = '19:00';
+              if (!parsed.lanesMode) parsed.lanesMode = 'auto';
+              if (!parsed.lanesCount) parsed.lanesCount = 1;
+              if (!parsed.hcpWindow) parsed.hcpWindow = 'rolling6';
+              if (!Array.isArray(parsed.lastHcpShifts)) parsed.lastHcpShifts = [];
+              if (!parsed.teamStats) parsed.teamStats = {};
+              return parsed;
+            }
+          }
+        } catch (e) {}
+        return createDefaultState();
+      }
+
+      let state = loadState();
+      let trendChartInstance = null;
+
+      const HAS_APPS_SCRIPT = typeof google !== 'undefined' && google.script && google.script.run;
+      let syncVersion = 0;
+      let syncBusy = false;
+      let saveDebounce = null;
+
+      function setSyncPill(text, colorClass) {
+        const el = document.getElementById('syncStatusPill');
+        if (!el) return;
+        el.textContent = text;
+        el.className = `rounded-lg border px-2 py-1 text-[10px] font-bold ${colorClass}`;
+      }
+
+      function saveState() {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+        if (!HAS_APPS_SCRIPT) return;
+        clearTimeout(saveDebounce);
+        setSyncPill('Syncing…', 'border-amber-500/40 bg-amber-500/10 text-amber-300');
+        saveDebounce = setTimeout(() => {
+          syncBusy = true;
+          google.script.run
+            .withSuccessHandler(res => {
+              if (res && res.version) syncVersion = res.version;
+              syncBusy = false;
+              setSyncPill('● Live Sync', 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300');
+            })
+            .withFailureHandler(() => {
+              syncBusy = false;
+              setSyncPill('Sync Retry', 'border-rose-500/40 bg-rose-500/10 text-rose-300');
+            })
+            .saveLiveState(JSON.stringify(state));
+        }, 250);
+      }
+
+      function pollLiveState() {
+        if (!HAS_APPS_SCRIPT || syncBusy) return;
+        const activeTag = document.activeElement ? document.activeElement.tagName : '';
+        const modalOpen = !document.getElementById('modalBackdrop').classList.contains('hidden');
+        if (modalOpen || activeTag === 'INPUT' || activeTag === 'TEXTAREA') return;
+
+        google.script.run
+          .withSuccessHandler(res => {
+            if (!res) return;
+            setSyncPill('● Live Sync', 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300');
+            if (res.version > syncVersion && res.stateJson) {
+              try {
+                const remote = JSON.parse(res.stateJson);
+                if (remote && Array.isArray(remote.members)) {
+                  // Preserve this phone's own signed-in user & current screen
+                  const myId = state.signedInMemberId;
+                  const myScreen = state.activeScreen;
+                  state = remote;
+                  state.signedInMemberId = myId;
+                  state.activeScreen = myScreen;
+                  syncVersion = res.version;
+                  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+                  renderAll();
+                }
+              } catch (e) {}
+            } else if (res.version === 0 && syncVersion === 0) {
+              // Seed sheet on very first launch
+              saveState();
+            }
+          })
+          .getLiveState();
+      }
+
+      function showToast(msg) {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.classList.remove('hidden');
+        clearTimeout(showToast._t);
+        showToast._t = setTimeout(() => el.classList.add('hidden'), 3200);
+      }
+
+      // --- HELPERS ---
+      function getAvg(m) {
+        if (state.hcpWindow === 'rolling6' && Array.isArray(m.history) && m.history.length > 0) {
+          const recent = m.history.slice(-6);
+          return Math.round(recent.reduce((a, b) => a + b, 0) / recent.length);
+        }
+        if (!m.games || m.games <= 0) return m.isKid ? 85 : 130;
+        return Math.round(m.totalPins / m.games);
+      }
+      function getHandicap(m) {
+        if (Number(state.hcpBasis) <= 0) return 0;
+        return Math.max(0, Math.round((Number(state.hcpBasis) - getAvg(m)) * state.hcpPct));
+      }
+      function getNetAvg(m) { return getAvg(m) + getHandicap(m); }
+      function getTeamKey(idA, idB) { return [idA, idB].sort().join('|'); }
+      function getTeamAvg(p1, p2) {
+        if (!p1 || !p2) return p1 ? getAvg(p1) : 130;
+        const key = getTeamKey(p1.id, p2.id);
+        const ts = state.teamStats && state.teamStats[key];
+        if (ts && ts.games > 0) {
+          if (state.hcpWindow === 'rolling6' && Array.isArray(ts.history) && ts.history.length > 0) {
+            const rec = ts.history.slice(-6);
+            return Math.round(rec.reduce((a, b) => a + b, 0) / rec.length);
+          }
+          return Math.round(ts.totalPins / ts.games);
+        }
+        return Math.round((getAvg(p1) + getAvg(p2)) / 2);
+      }
+      function getTeamHandicap(p1, p2) {
+        if (Number(state.hcpBasis) <= 0) return 0;
+        return Math.max(0, Math.round((Number(state.hcpBasis) - getTeamAvg(p1, p2)) * (state.hcpPct || 0.8)));
+      }
+      function getRsvp(m) { return (m.rsvps && m.rsvps[state.selectedDateId]) || 'pending'; }
+      function getInPlayers() { return state.members.filter(m => getRsvp(m) === 'in'); }
+      function getActiveGame() { return GAME_STYLES.find(g => g.id === state.activeGameId) || GAME_STYLES[0]; }
+      function isCurrentUserAdmin() {
+        const me = state.members.find(m => m.id === state.signedInMemberId);
+        return !!(me && (me.isAdmin || me.id === 'curtis'));
+      }
+      function getPersonalLink(memberId) {
+        const base = (state.webAppUrl || '').trim() || (window.location.href.split('?')[0].split('#')[0]);
+        const sep = base.includes('?') ? '&' : '?';
+        return `${base}${sep}player=${encodeURIComponent(memberId)}`;
+      }
+      function copyTextSafe(text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).catch(() => {});
+        }
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (e) {}
+        document.body.removeChild(ta);
+      }
+
+      function formatDisplayDate(iso) {
+        const [y, m, d] = (iso || '2026-12-03').split('-').map(Number);
+        const dt = new Date(y, m - 1, d);
+        return dt.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+      }
+
+      function formatTime12h(hhmm) {
+        const [h, m] = (hhmm || '19:00').split(':').map(Number);
+        const suffix = h >= 12 ? 'PM' : 'AM';
+        const h12 = h % 12 === 0 ? 12 : h % 12;
+        return `${h12}:${String(m).padStart(2, '0')} ${suffix}`;
+      }
+
+      // Medford Lanes (665 Stokes Rd, Medford NJ · 609-654-4021) 2-Hour Family Special Pricing & Hours
+      function getMedfordLanesPricing(isoDate, setTime) {
+        const [y, m, d] = isoDate.split('-').map(Number);
+        const dt = new Date(y, m - 1, d);
+        const dow = dt.getDay(); // 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
+        const isSummer = m >= 6 && m <= 8;
+        const [hh, mm] = (setTime || '19:00').split(':').map(Number);
+        const startMins = hh * 60 + mm;
+
+        if (dow === 2) {
+          return { closed: true, tier: 'Closed (Tuesdays)', ratePerLane: 0, color: 'text-rose-400', note: 'Medford Lanes is closed on Tuesdays.' };
+        }
+        if (dow === 0 && isSummer) {
+          return { closed: true, tier: 'Closed (Summer Sundays)', ratePerLane: 0, color: 'text-rose-400', note: 'Closed Sundays June–August (unless heavy rain).' };
+        }
+
+        let warning = '';
+        if (dow === 0) {
+          if (startMins + 120 > 17 * 60) warning = 'Fall/Winter Sunday hours are Noon–5:00 PM (try 3:00 PM start).';
+          return { closed: false, tier: 'Sunday 2-Hr Special', ratePerLane: 69.99, color: 'text-amber-400', note: 'Free shoes for up to 6 per lane.', warning };
+        }
+        if (dow === 6) {
+          if (startMins + 120 > 22 * 60) warning = "Glow Rock 'N Bowl starts Sat 10:00 PM (2-Hr Special not valid during Glow).";
+          return { closed: false, tier: 'Saturday 2-Hr Special', ratePerLane: 79.99, color: 'text-sky-400', note: 'Free shoes for up to 6 per lane.', warning };
+        }
+        if ((dow === 1 || dow === 3 || dow === 4) && startMins + 120 > 21 * 60) {
+          warning = 'Mon/Wed/Thu close at 9:00 PM (7:00 PM is the latest 2-hr start).';
+        }
+        if (dow === 5 && startMins + 120 > 21 * 60 + 15) {
+          warning = "Fri Glow Rock 'N Bowl starts at 9:15 PM (7:00 PM start fits before Glow).";
+        }
+        if (startMins < 18 * 60) {
+          return { closed: false, tier: 'Weekday Matinee (<6 PM)', ratePerLane: 59.99, color: 'text-emerald-400', note: 'Lowest rate! Free shoes for up to 6 per lane.', warning };
+        }
+        return { closed: false, tier: 'Weeknight 2-Hr Special (6+ PM)', ratePerLane: 69.99, color: 'text-amber-400', note: 'Best evening value! Free shoes for up to 6 per lane.', warning };
+      }
+
+      function getLaneRecommendation(playerCount, ratePerLane) {
+        const n = Math.max(1, playerCount);
+        const minLanes = Math.ceil(n / 6);
+        const p1 = (ratePerLane * 1) / n;
+        const p2 = (ratePerLane * 2) / n;
+        if (n <= 4) {
+          return {
+            recommended: 1,
+            minLanes: 1,
+            headline: `Recommended: 1 Lane ($${p1.toFixed(2)}/ea)`,
+            detail: `Best pace & value for ${n} bowler${n === 1 ? '' : 's'} (2 lanes would double cost to $${p2.toFixed(2)}/ea).`
+          };
+        }
+        if (n <= 6) {
+          return {
+            recommended: 1,
+            minLanes: 1,
+            headline: `Best Value: 1 Lane ($${p1.toFixed(2)}/ea) · Faster Pace: 2 Lanes ($${p2.toFixed(2)}/ea)`,
+            detail: `Medford Lanes includes free shoes for up to 6 on 1 lane—saves $${(p2 - p1).toFixed(2)}/person vs. 2 lanes.`
+          };
+        }
+        const totalRec = ratePerLane * minLanes;
+        return {
+          recommended: minLanes,
+          minLanes,
+          headline: `Required: ${minLanes} Lanes ($${(totalRec / n).toFixed(2)}/ea)`,
+          detail: `${n} bowlers exceeds the 6-person/lane free-shoe limit—${minLanes} lanes keeps everyone covered and moving.`
+        };
+      }
+
+      function getLiveScore(memberId) {
+        if (!state.liveScores[memberId]) {
+          state.liveScores[memberId] = {
+            frames: createEmptyFrames(),
+            manualTotal: null,
+            manualStats: { strikes: 0, spares: 0, gutters: 0, splits: 0 },
+            challengeDone: false
+          };
+        }
+        return state.liveScores[memberId];
+      }
+
+      function isSplitLeave(remainingPins) {
+        if (remainingPins.length < 2 || remainingPins.includes(1)) return false;
+        const adj = {
+          2: [4,5], 3: [5,6], 4: [2,7,8], 5: [2,3,8,9], 6: [3,9,10],
+          7: [4,8], 8: [4,5,7,9], 9: [5,6,8,10], 10: [6,9]
+        };
+        const visited = new Set([remainingPins[0]]);
+        const q = [remainingPins[0]];
+        while (q.length) {
+          const cur = q.shift();
+          for (const n of (adj[cur] || [])) {
+            if (remainingPins.includes(n) && !visited.has(n)) {
+              visited.add(n);
+              q.push(n);
+            }
+          }
+        }
+        return visited.size < remainingPins.length;
+      }
+
+      function computeScoreSummary(memberId) {
+        const ls = getLiveScore(memberId);
+        const game = getActiveGame();
+        const isNoTap = game.id === 'no_tap_9';
+        const isLowBall = game.id === 'low_ball';
+
+        let rolls = [];
+        let strikes = 0, spares = 0, gutters = 0, splits = 0, hasAny = false;
+
+        ls.frames.forEach((fr, idx) => {
+          const r1 = fr.b1;
+          const r2 = fr.b2;
+          const r3 = fr.b3;
+          if (r1 !== null || r2 !== null || r3 !== null) hasAny = true;
+          if (fr.split) splits++;
+
+          if (r1 === 0) gutters++;
+          if (r2 === 0) gutters++;
+          if (r3 === 0) gutters++;
+
+          const eff1 = r1 === null ? 0 : (isNoTap && r1 === 9 ? 10 : (isLowBall && r1 === 0 ? 10 : r1));
+          const eff2 = r2 === null ? 0 : (isLowBall && r2 === 0 ? 10 : r2);
+          const eff3 = r3 === null ? 0 : (isNoTap && r3 === 9 ? 10 : (isLowBall && r3 === 0 ? 10 : r3));
+
+          if (idx < 9) {
+            if (r1 !== null && eff1 === 10) {
+              strikes++;
+              rolls.push(10);
+            } else {
+              rolls.push(eff1);
+              rolls.push(eff2);
+              if (r1 !== null && r2 !== null && eff1 + eff2 >= 10) spares++;
+            }
+          } else {
+            rolls.push(eff1, eff2);
+            if (r1 !== null && eff1 === 10) strikes++;
+            else if (r1 !== null && r2 !== null && eff1 + eff2 >= 10) spares++;
+            if (eff1 === 10 || eff1 + eff2 >= 10) {
+              rolls.push(eff3);
+              if (r3 !== null && eff3 === 10) strikes++;
+            }
+          }
+        });
+
+        let total = 0, rIdx = 0;
+        for (let f = 0; f < 10; f++) {
+          const a = rolls[rIdx] || 0;
+          if (a === 10) {
+            total += 10 + (rolls[rIdx + 1] || 0) + (rolls[rIdx + 2] || 0);
+            rIdx += 1;
+          } else {
+            const b = rolls[rIdx + 1] || 0;
+            if (a + b >= 10) total += 10 + (rolls[rIdx + 2] || 0);
+            else total += a + b;
+            rIdx += 2;
+          }
+        }
+
+        if (state.entryMode === 'screen' && ls.manualTotal !== null) {
+          return {
+            total: ls.manualTotal,
+            strikes: Number(ls.manualStats.strikes || 0),
+            spares: Number(ls.manualStats.spares || 0),
+            gutters: Number(ls.manualStats.gutters || 0),
+            splits: Number(ls.manualStats.splits || 0),
+            hasAny: true
+          };
+        }
+
+        return { total, strikes, spares, gutters, splits, hasAny };
+      }
+
+      // --- MATCHUPS & ROTATION ORDER ---
+      function getPairPartitions(arr) {
+        if (arr.length === 0) return [[]];
+        if (arr.length === 2) return [[[arr[0], arr[1]]]];
+        const first = arr[0], rest = arr.slice(1), res = [];
+        for (let i = 0; i < rest.length; i++) {
+          const rem = rest.slice(0, i).concat(rest.slice(i + 1));
+          for (const sub of getPairPartitions(rem)) res.push([[first, rest[i]], ...sub]);
+        }
+        return res;
+      }
+
+      function generateMatchups(jitter = false) {
+        const players = getInPlayers();
+        if (players.length < 2) {
+          state.matchups = [];
+          return;
+        }
+        const game = getActiveGame();
+        if (game.mode === 'singles') {
+          const sorted = [...players].sort((a, b) => getNetAvg(b) - getNetAvg(a));
+          const l1 = [], l2 = [];
+          sorted.forEach((p, i) => (i % 2 === 0 ? l1 : l2).push(p.id));
+          state.matchups = [
+            { label: 'Lane 1', playerIds: l1 },
+            { label: 'Lane 2', playerIds: l2 }
+          ].filter(x => x.playerIds.length);
+        } else {
+          let pool = [...players];
+          let odd = null;
+          if (pool.length % 2 === 1) {
+            odd = pool.splice(jitter ? Math.floor(Math.random() * pool.length) : pool.length - 1, 1)[0];
+          }
+          // For > 8 players, pair greedily by sorted high+low to keep fast
+          let bestPart = [];
+          if (pool.length <= 8) {
+            const parts = getPairPartitions(pool);
+            let bestCost = Infinity;
+            for (const part of parts) {
+              const nets = part.map(([a, b]) => getNetAvg(a) + getNetAvg(b));
+              const spread = Math.max(...nets) - Math.min(...nets);
+              let repeatPen = 0;
+              for (const [a, b] of part) {
+                const k = [a.id, b.id].sort().join('|');
+                if (state.partnerHistory.some(p => [p[0], p[1]].sort().join('|') === k)) repeatPen += 20;
+              }
+              const cost = spread * 2 + repeatPen + (jitter ? Math.random() * 15 : 0);
+              if (cost < bestCost) { bestCost = cost; bestPart = part; }
+            }
+          } else {
+            const sorted = [...pool].sort((a, b) => getNetAvg(b) - getNetAvg(a));
+            while (sorted.length >= 2) bestPart.push([sorted.shift(), sorted.pop()]);
+          }
+          state.matchups = bestPart.map(([a, b], idx) => ({
+            label: `Team ${String.fromCharCode(65 + idx)}`,
+            playerIds: [a.id, b.id]
+          }));
+          if (odd) {
+            state.matchups.push({ label: `Team ${String.fromCharCode(65 + state.matchups.length)} (Ghost)`, playerIds: [odd.id] });
+          }
+        }
+        saveState();
+      }
+
+      // Which bowlers are scheduled to bowl in a given frame (0..9)?
+      function getBowlersForFrame(frameIdx) {
+        const players = getInPlayers();
+        const game = getActiveGame();
+        if (game.mode !== 'doubles' || state.matchups.length === 0) {
+          return players.map(p => p.id);
+        }
+        const isOddFrame = (frameIdx + 1) % 2 === 1;
+        const ids = [];
+        state.matchups.forEach(team => {
+          if (team.playerIds.length === 1) ids.push(team.playerIds[0]);
+          else ids.push(isOddFrame ? team.playerIds[0] : team.playerIds[1]);
+        });
+        return ids;
+      }
+
+      function isFrameCompleteForBowler(memberId, frameIdx) {
+        const fr = getLiveScore(memberId).frames[frameIdx];
+        if (fr.b1 === null) return false;
+        const game = getActiveGame();
+        const eff1 = game.id === 'no_tap_9' && fr.b1 === 9 ? 10 : fr.b1;
+        if (frameIdx < 9) {
+          return eff1 === 10 || fr.b2 !== null;
+        }
+        if (eff1 === 10 || (fr.b2 !== null && eff1 + fr.b2 >= 10)) {
+          return fr.b2 !== null && fr.b3 !== null;
+        }
+        return fr.b2 !== null;
+      }
+
+      function advanceToNextBowler() {
+        const frameBowlers = getBowlersForFrame(state.playFrameIdx);
+        if (frameBowlers.length === 0) return;
+
+        // First: check if a skipped bowler should be asked "Is X back yet?"
+        const skippedInFrame = frameBowlers.filter(id => state.skippedIds.includes(id) && !isFrameCompleteForBowler(id, state.playFrameIdx));
+        const unbowledActive = frameBowlers.filter(id => !state.skippedIds.includes(id) && !isFrameCompleteForBowler(id, state.playFrameIdx));
+
+        if (unbowledActive.length > 0) {
+          // Move to next unbowled active bowler, and if someone is skipped, surface the return prompt!
+          const curIdx = unbowledActive.indexOf(state.activeBowlerId);
+          state.activeBowlerId = unbowledActive[(curIdx + 1) % unbowledActive.length];
+          state.currentBall = 0;
+          state.pendingReturnCheckId = skippedInFrame.length > 0 ? skippedInFrame[0] : null;
+        } else if (skippedInFrame.length > 0) {
+          // All other bowlers finished this frame — prompt skipped bowler before moving to next frame!
+          state.pendingReturnCheckId = skippedInFrame[0];
+          state.activeBowlerId = skippedInFrame[0];
+          state.currentBall = 0;
+          const m = state.members.find(x => x.id === skippedInFrame[0]);
+          showToast(`Before Frame ${state.playFrameIdx + 2}: waiting on ${m ? m.name : 'bowler'} to finish Frame ${state.playFrameIdx + 1}.`);
+        } else {
+          // Entire frame complete! Advance to next frame
+          if (state.playFrameIdx < 9) {
+            state.playFrameIdx += 1;
+            const nextBowlers = getBowlersForFrame(state.playFrameIdx);
+            const nextReady = nextBowlers.find(id => !state.skippedIds.includes(id)) || nextBowlers[0];
+            state.activeBowlerId = nextReady;
+            state.currentBall = 0;
+            const nextSkipped = nextBowlers.find(id => state.skippedIds.includes(id));
+            state.pendingReturnCheckId = nextSkipped || null;
+            showToast(`Starting Frame ${state.playFrameIdx + 1}!`);
+          } else {
+            showToast('All 10 frames complete! Tap "Finish & Save Game" below.');
+          }
+        }
+        saveState();
+        renderPlayScreen();
+      }
+
+      // --- NAVIGATION ---
+      function switchScreen(screenName) {
+        if (screenName !== 'player') state.prevScreen = state.activeScreen;
+        state.activeScreen = screenName;
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        const target = document.getElementById(`screen-${screenName}`);
+        if (target) target.classList.add('active');
+        document.querySelectorAll('.nav-btn, .mnav-btn').forEach(btn => {
+          btn.setAttribute('aria-selected', String(btn.getAttribute('data-screen') === screenName));
+        });
+        renderAll();
+      }
+
+      // --- RENDERERS ---
+      function renderHeader() {
+        const g = getActiveGame();
+        document.getElementById('headerSubtitle').textContent = `${formatDisplayDate(state.selectedDateId)} · ${formatTime12h(state.setTime)} · ${g.short}`;
+        const signInBtn = document.getElementById('openSignInBtn');
+        if (signInBtn) {
+          const me = state.members.find(m => m.id === state.signedInMemberId);
+          signInBtn.textContent = me ? `Signed in: ${me.name}${(me.isAdmin || me.id === 'curtis') ? ' (Admin)' : ''}` : 'Sign In (Email)';
+        }
+      }
+
+      function renderCheckinScreen() {
+        document.getElementById('hcpBasis').value = String(state.hcpBasis);
+        const pctEl = document.getElementById('hcpPctSelect');
+        if (pctEl) pctEl.value = String(state.hcpPct || 0.8);
+        const winEl = document.getElementById('hcpWindowSelect');
+        if (winEl) winEl.value = state.hcpWindow || 'rolling6';
+
+        // Set time & lanes controls
+        const timeSel = document.getElementById('setTimeSelect');
+        if (timeSel) timeSel.value = state.setTime || '19:00';
+        const lAuto = document.getElementById('lanesAutoBtn');
+        const l1 = document.getElementById('lanes1Btn');
+        const l2 = document.getElementById('lanes2Btn');
+        const mode = state.lanesMode || 'auto';
+        if (lAuto && l1 && l2) {
+          lAuto.className = mode === 'auto' ? 'rounded px-2.5 py-1 bg-amber-500 text-slate-950 font-extrabold' : 'rounded px-2.5 py-1 text-slate-400 hover:text-white';
+          l1.className = mode === '1' ? 'rounded px-2.5 py-1 bg-amber-500 text-slate-950 font-extrabold' : 'rounded px-2.5 py-1 text-slate-400 hover:text-white';
+          l2.className = mode === '2' ? 'rounded px-2.5 py-1 bg-amber-500 text-slate-950 font-extrabold' : 'rounded px-2.5 py-1 text-slate-400 hover:text-white';
+        }
+
+        // Monthly Calendar Grid
+        const yr = state.calYear ?? 2026;
+        const mo = state.calMonth ?? 11;
+        const firstDay = new Date(yr, mo, 1);
+        const daysInMonth = new Date(yr, mo + 1, 0).getDate();
+        const startDow = firstDay.getDay();
+        document.getElementById('calMonthLabel').textContent = firstDay.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+        let calHtml = '';
+        for (let b = 0; b < startDow; b++) {
+          calHtml += `<div class="h-12 rounded-lg bg-slate-900/20"></div>`;
+        }
+        const me = state.members.find(m => m.id === state.signedInMemberId);
+        for (let day = 1; day <= daysInMonth; day++) {
+          const iso = `${yr}-${String(mo + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+          const info = getMedfordLanesPricing(iso, state.setTime);
+          const isSelected = iso === state.selectedDateId;
+          const availCount = state.members.filter(m => m.rsvps && m.rsvps[iso] === 'in').length;
+          const myAvail = me && me.rsvps && me.rsvps[iso] === 'in';
+          const dotColor = info.closed ? 'bg-slate-600' : (info.ratePerLane <= 60 ? 'bg-emerald-400' : info.ratePerLane <= 70 ? 'bg-amber-400' : 'bg-sky-400');
+
+          calHtml += `
+            <button type="button" data-cal-date="${iso}" class="h-12 rounded-lg border p-1 flex flex-col items-center justify-between transition ${
+              isSelected
+                ? 'border-amber-500 bg-amber-500/20 shadow'
+                : info.closed
+                ? 'border-slate-900 bg-slate-900/40 opacity-45 hover:opacity-70'
+                : myAvail
+                ? 'border-emerald-500/50 bg-emerald-950/25 hover:border-emerald-400'
+                : 'border-slate-800 bg-slate-900/60 hover:border-slate-600'
+            }">
+              <div class="w-full flex items-center justify-between px-0.5">
+                <span class="text-[11px] font-bold ${isSelected ? 'text-amber-300' : 'text-slate-200'}">${day}</span>
+                <span class="h-1.5 w-1.5 rounded-full ${dotColor}"></span>
+              </div>
+              <div class="text-[9px] font-bold ${availCount > 0 ? 'text-emerald-400' : 'text-slate-600'}">
+                ${info.closed ? 'Closed' : (availCount > 0 ? `${availCount} IN` : `$${Math.round(info.ratePerLane)}`)}
+              </div>
+            </button>
+          `;
+        }
+        document.getElementById('calendarGrid').innerHTML = calHtml;
+
+        // Selected Date & Medford Lanes Cost Card
+        const selInfo = getMedfordLanesPricing(state.selectedDateId, state.setTime);
+        const selInCount = getInPlayers().length;
+        const rec = getLaneRecommendation(selInCount, selInfo.ratePerLane);
+        const lanes = mode === 'auto' ? rec.recommended : Math.max(rec.minLanes, Number(mode) || 1);
+        state.lanesCount = lanes;
+        const totalCost = selInfo.closed ? 0 : selInfo.ratePerLane * lanes;
+        const perPerson = selInCount > 0 ? (totalCost / selInCount) : totalCost;
+        const mySelAvail = me && me.rsvps && me.rsvps[state.selectedDateId] === 'in';
+
+        document.getElementById('selectedDateInfoCard').innerHTML = `
+          <div class="space-y-2.5">
+            <div>
+              <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Selected Night</div>
+              <div class="text-base font-extrabold text-white">${formatDisplayDate(state.selectedDateId)}</div>
+              <div class="text-xs font-semibold text-amber-400">${formatTime12h(state.setTime)} · Medford Lanes</div>
+            </div>
+
+            <div class="rounded-lg border border-slate-800 bg-slate-900 p-3 space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold ${selInfo.color}">${selInfo.tier}</span>
+                ${!selInfo.closed ? `<span class="text-xs font-extrabold text-white">$${selInfo.ratePerLane.toFixed(2)}/ln</span>` : ''}
+              </div>
+              <div class="text-[11px] text-slate-400">${selInfo.note}</div>
+              ${selInfo.warning ? `<div class="rounded bg-rose-950/60 border border-rose-500/40 px-2 py-1 text-[11px] text-rose-300 font-medium">⚠ ${selInfo.warning}</div>` : ''}
+            </div>
+
+            ${!selInfo.closed ? `
+              <div class="rounded-lg border border-sky-500/30 bg-sky-950/25 p-2.5 space-y-1">
+                <div class="text-[11px] font-bold text-sky-300">${rec.headline}</div>
+                <div class="text-[10px] text-slate-300">${rec.detail}</div>
+              </div>
+              <div class="grid grid-cols-2 gap-2 text-center">
+                <div class="rounded-lg bg-slate-900 border border-slate-800 p-2">
+                  <div class="text-[10px] text-slate-400">${lanes} Lane${lanes > 1 ? 's' : ''} ${mode === 'auto' ? '(Auto)' : ''}</div>
+                  <div class="text-sm font-extrabold text-white">$${totalCost.toFixed(2)}</div>
+                </div>
+                <div class="rounded-lg bg-emerald-950/30 border border-emerald-500/40 p-2">
+                  <div class="text-[10px] text-emerald-300">Est. Per Person (${selInCount} IN)</div>
+                  <div class="text-sm font-extrabold text-emerald-400">$${perPerson.toFixed(2)}</div>
+                </div>
+              </div>
+            ` : ''}
+          </div>
+
+          <div class="space-y-2 pt-2 border-t border-slate-800">
+            ${me ? `
+              <button type="button" id="toggleMyAvailBtn" class="w-full rounded-lg py-2 text-xs font-extrabold transition ${
+                mySelAvail
+                  ? 'bg-emerald-500 text-slate-950 hover:bg-emerald-400'
+                  : 'border border-emerald-500/50 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20'
+              }">
+                ${mySelAvail ? `✓ ${me.name} is Available (Tap to Cancel)` : `Mark ${me.name} Available for This Day`}
+              </button>
+            ` : ''}
+            <div class="text-[10px] text-slate-500 text-center">665 Stokes Rd, Medford NJ · Reserve: 609-654-4021</div>
+          </div>
+        `;
+
+        // RSVP counts
+        const inPlayers = getInPlayers();
+        const adultsIn = inPlayers.filter(m => !m.isKid).length;
+        const kidsIn = inPlayers.filter(m => m.isKid).length;
+        document.getElementById('rsvpCountLine').textContent = `${adultsIn} Adult${adultsIn === 1 ? '' : 's'} · ${kidsIn} Kid${kidsIn === 1 ? '' : 's'} checked IN`;
+        const isAdmin = isCurrentUserAdmin();
+        const allInBtn = document.getElementById('allInBtn');
+        if (allInBtn) {
+          if (!isAdmin) {
+            allInBtn.classList.add('hidden');
+          } else {
+            allInBtn.classList.remove('hidden');
+            const everyoneIn = state.members.length > 0 && inPlayers.length === state.members.length;
+            allInBtn.textContent = everyoneIn ? 'All Out' : 'All In';
+            allInBtn.className = everyoneIn
+              ? 'rounded-lg border border-rose-600/50 bg-rose-950/40 px-2.5 py-1 text-xs font-semibold text-rose-300 hover:bg-rose-900/50'
+              : 'rounded-lg border border-emerald-600/50 bg-emerald-950/40 px-2.5 py-1 text-xs font-semibold text-emerald-300 hover:bg-emerald-900/50';
+          }
+        }
+
+        // Put signed-in user's own row first, then everyone else
+        const orderedMembers = [...state.members].sort((a, b) => {
+          if (a.id === state.signedInMemberId) return -1;
+          if (b.id === state.signedInMemberId) return 1;
+          return 0;
+        });
+
+        // Roster RSVP & Game Vote list (Own RSVP editable; others read-only unless Admin)
+        document.getElementById('rsvpList').innerHTML = orderedMembers.map(m => {
+          const status = getRsvp(m);
+          const isMe = m.id === state.signedInMemberId;
+          const canEdit = isAdmin || isMe;
+          const voteObj = GAME_STYLES.find(g => g.id === m.vote) || GAME_STYLES[0];
+          const statusBadge = status === 'in'
+            ? '<span class="rounded-md bg-emerald-500/20 border border-emerald-500/40 px-2.5 py-1 text-[11px] font-bold text-emerald-300">Yes (IN)</span>'
+            : status === 'out'
+            ? '<span class="rounded-md bg-rose-500/20 border border-rose-500/40 px-2.5 py-1 text-[11px] font-bold text-rose-300">No (Out)</span>'
+            : '<span class="rounded-md bg-slate-800 px-2.5 py-1 text-[11px] font-semibold text-slate-400">Pending</span>';
+
+          return `
+            <div class="flex flex-col gap-2 rounded-xl border p-3 sm:flex-row sm:items-center sm:justify-between ${
+              isMe
+                ? 'border-sky-500/60 bg-sky-950/20 shadow'
+                : status === 'in' ? 'border-emerald-500/35 bg-emerald-950/15' : status === 'out' ? 'border-rose-500/25 bg-rose-950/10 opacity-75' : 'border-slate-800 bg-slate-950'
+            }">
+              <div class="min-w-0">
+                <div class="flex flex-wrap items-center gap-2">
+                  <button type="button" data-open-player="${m.id}" class="text-sm font-bold text-white hover:text-amber-400 underline decoration-slate-700 underline-offset-2">${m.name}</button>
+                  ${isMe ? '<span class="rounded bg-sky-500 px-1.5 py-0.5 text-[10px] font-extrabold text-slate-950">You</span>' : ''}
+                  ${m.isAdmin || m.id === 'curtis' ? '<span class="rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-bold text-amber-300">Admin</span>' : ''}
+                  ${m.isKid ? '<span class="rounded bg-sky-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-sky-300">Kid/Guest</span>' : ''}
+                  ${m.tag ? `<span class="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] font-medium text-slate-300">${m.tag}</span>` : ''}
+                </div>
+                <div class="mt-0.5 flex flex-wrap items-center gap-2 text-[11px] text-slate-500">
+                  <span class="truncate">${m.email ? m.email : 'No email linked'}</span>
+                  ${canEdit ? (m.email
+                    ? `<label class="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-300 cursor-pointer"><input type="checkbox" data-remind-toggle="${m.id}" ${m.remind48h ? 'checked' : ''} class="h-3 w-3 rounded border-slate-600 bg-slate-900 text-amber-500" />48h Email Reminder</label>`
+                    : `<span class="text-[10px] text-slate-600">· Add email for 48h reminder</span>`
+                  ) : (m.remind48h && m.email ? '<span class="text-[10px] text-amber-400/70">· 48h Reminder On</span>' : '')}
+                </div>
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                ${isAdmin ? `<button type="button" data-copy-link="${m.id}" title="Copy personalized login link for ${m.name}" class="rounded-lg border border-slate-700 bg-slate-900 px-2 py-1 text-[11px] font-semibold text-sky-300 hover:border-sky-400">Link</button>` : ''}
+                ${canEdit ? `
+                  <button type="button" data-edit-player="${m.id}" class="rounded-lg border border-slate-700 bg-slate-900 px-2 py-1 text-[11px] font-semibold text-slate-300 hover:border-amber-500 hover:text-amber-300">Edit</button>
+                  <select data-vote-game="${m.id}" aria-label="Game vote for ${m.name}" class="rounded-lg border border-slate-700 bg-slate-900 px-2 py-1 text-[11px] text-slate-200">
+                    ${GAME_STYLES.map(g => `<option value="${g.id}" ${m.vote === g.id ? 'selected' : ''}>Vote: ${g.short}</option>`).join('')}
+                  </select>
+                  <div class="inline-flex rounded-lg border border-slate-700 bg-slate-900 p-0.5 text-[11px] font-bold">
+                    <button type="button" data-rsvp="${m.id}:in" class="rounded px-2 py-0.5 ${status === 'in' ? 'bg-emerald-500 text-slate-950' : 'text-slate-400 hover:text-white'}">Yes</button>
+                    <button type="button" data-rsvp="${m.id}:out" class="rounded px-2 py-0.5 ${status === 'out' ? 'bg-rose-500 text-white' : 'text-slate-400 hover:text-white'}">No</button>
+                  </div>
+                ` : `
+                  <span class="rounded-lg border border-slate-800 bg-slate-900/70 px-2 py-1 text-[11px] text-slate-400">Vote: ${voteObj.short}</span>
+                  ${statusBadge}
+                `}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        // Top 3 Voted Games
+        const counts = {};
+        GAME_STYLES.forEach(g => { counts[g.id] = 0; });
+        inPlayers.forEach(m => { if (m.vote && counts[m.vote] !== undefined) counts[m.vote]++; });
+        const top3 = [...GAME_STYLES].sort((a, b) => counts[b.id] - counts[a.id]).slice(0, 3);
+
+        document.getElementById('topThreeGames').innerHTML = top3.map((g, idx) => {
+          const isSel = state.activeGameId === g.id;
+          return `
+            <button type="button" data-select-game="${g.id}" class="w-full text-left rounded-xl border p-3 transition ${
+              isSel ? 'border-amber-500 bg-amber-500/15' : 'border-slate-800 bg-slate-950 hover:border-slate-600'
+            }">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-xs font-extrabold ${isSel ? 'text-amber-400' : 'text-white'}">#${idx + 1} ${g.name}</span>
+                <span class="rounded-full bg-slate-800 px-2 py-0.5 text-[10px] font-bold text-sky-400">${counts[g.id]} votes</span>
+              </div>
+              <div class="mt-1 text-[11px] text-slate-400 line-clamp-2">${g.summary}</div>
+            </button>
+          `;
+        }).join('');
+
+        // Mini Matchups preview
+        const memberById = Object.fromEntries(state.members.map(m => [m.id, m]));
+        document.getElementById('miniMatchupsPreview').innerHTML = state.matchups.length
+          ? state.matchups.map(t => {
+              const ps = t.playerIds.map(id => memberById[id]).filter(Boolean);
+              const names = ps.map(p => p.name).join(' & ');
+              const tHcp = ps.length === 2 ? getTeamHandicap(ps[0], ps[1]) : (ps[0] ? getHandicap(ps[0]) : 0);
+              const hasHist = ps.length === 2 && state.teamStats && state.teamStats[getTeamKey(ps[0].id, ps[1].id)];
+              return `<div class="flex items-center justify-between rounded-lg bg-slate-950 border border-slate-800 px-2.5 py-1.5"><div><span class="font-bold text-amber-400">${t.label}</span> <span class="text-slate-200 ml-1">${names}</span></div><span class="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] font-bold text-emerald-400" title="${hasHist ? 'Own team handicap from games together' : 'Estimated from partner averages'}">Team +${tHcp}</span></div>`;
+            }).join('')
+          : '<div class="text-slate-500">Check in at least 2 bowlers.</div>';
+      }
+
+      function renderPlayScreen() {
+        const game = getActiveGame();
+        const frameBowlers = getBowlersForFrame(state.playFrameIdx);
+        const memberById = Object.fromEntries(state.members.map(m => [m.id, m]));
+
+        document.getElementById('playGameBadge').textContent = game.name;
+        document.getElementById('playFrameBadge').textContent = `Frame ${state.playFrameIdx + 1} of 10`;
+        document.getElementById('playGameRuleLine').textContent = game.summary;
+
+        const sel = document.getElementById('playGameSelect');
+        sel.innerHTML = GAME_STYLES.map(g => `<option value="${g.id}" ${g.id === state.activeGameId ? 'selected' : ''}>${g.short}</option>`).join('');
+
+        if (!frameBowlers.includes(state.activeBowlerId) && frameBowlers.length > 0) {
+          state.activeBowlerId = frameBowlers[0];
+        }
+
+        // Rotation Queue Bar
+        const queueEl = document.getElementById('rotationQueueBar');
+        queueEl.innerHTML = frameBowlers.map(id => {
+          const m = memberById[id];
+          if (!m) return '';
+          const isCur = id === state.activeBowlerId;
+          const done = isFrameCompleteForBowler(id, state.playFrameIdx);
+          const away = state.skippedIds.includes(id);
+          const sum = computeScoreSummary(id);
+          return `
+            <button type="button" data-play-pick="${id}" class="shrink-0 rounded-xl border px-3 py-2 text-left transition ${
+              isCur
+                ? 'border-amber-500 bg-amber-500 text-slate-950 shadow'
+                : away
+                ? 'border-sky-500/50 bg-sky-950/30 text-sky-300'
+                : done
+                ? 'border-emerald-600/40 bg-emerald-950/20 text-emerald-300'
+                : 'border-slate-700 bg-slate-950 text-slate-200 hover:border-slate-500'
+            }">
+              <div class="flex items-center gap-1.5 text-xs font-extrabold">
+                <span>${m.name}</span>
+                ${away ? '<span class="text-[10px] opacity-80">(Away)</span>' : done ? '<span>✓</span>' : ''}
+              </div>
+              <div class="text-[10px] ${isCur ? 'text-slate-900 font-semibold' : 'text-slate-400'}">Score: ${sum.total}</div>
+            </button>
+          `;
+        }).join('');
+
+        // Return Prompt Banner ("Is X back yet?")
+        const banner = document.getElementById('returnPromptBanner');
+        if (state.pendingReturnCheckId && memberById[state.pendingReturnCheckId]) {
+          const m = memberById[state.pendingReturnCheckId];
+          document.getElementById('returnPromptText').textContent = `Is ${m.name} back yet to bowl Frame ${state.playFrameIdx + 1}?`;
+          banner.classList.remove('hidden');
+        } else {
+          banner.classList.add('hidden');
+        }
+
+        // Active Bowler Focused Scorecard
+        const card = document.getElementById('activeBowlerCard');
+        const m = memberById[state.activeBowlerId];
+        if (!m) {
+          card.innerHTML = `<div class="text-center py-6 text-sm text-slate-400">No bowlers checked in. Go to <strong>Check-In &amp; Dates</strong> first.</div>`;
+          return;
+        }
+
+        const ls = getLiveScore(m.id);
+        const fr = ls.frames[state.playFrameIdx];
+        const sum = computeScoreSummary(m.id);
+        const hcp = getHandicap(m);
+        const eff1 = fr.b1 === null ? 0 : (game.id === 'no_tap_9' && fr.b1 === 9 ? 10 : fr.b1);
+        const remainingPinsCount = state.currentBall === 0 ? 10 : (state.playFrameIdx === 9 && (eff1 === 10 || (fr.b2 !== null && eff1 + fr.b2 >= 10)) ? 10 : Math.max(0, 10 - (fr.b1 || 0)));
+
+        // Pin rack standing pins
+        const allPins = [1,2,3,4,5,6,7,8,9,10];
+        const standingPins = state.currentBall === 0
+          ? allPins
+          : (state.playFrameIdx === 9 && fr.b1Pins.length === 10 ? allPins : allPins.filter(p => !fr.b1Pins.includes(p)));
+        const curPinsArr = state.currentBall === 0 ? fr.b1Pins : (state.currentBall === 1 ? fr.b2Pins : fr.b3Pins);
+        const pinRows = [[7,8,9,10],[4,5,6],[2,3],[1]];
+
+        card.innerHTML = `
+          <!-- Bowler Top Row -->
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <div class="flex items-center gap-2">
+                <button type="button" data-open-player="${m.id}" class="text-xl font-extrabold text-white hover:text-amber-400 underline decoration-slate-700 underline-offset-4">${m.name}</button>
+                <span class="rounded-full bg-slate-800 px-2.5 py-0.5 text-xs font-semibold text-slate-300">Avg ${getAvg(m)} · +${hcp} Hcp</span>
+              </div>
+              <label class="mt-1.5 inline-flex items-center gap-2 text-xs text-amber-300 cursor-pointer">
+                <input type="checkbox" data-challenge-check="${m.id}" ${ls.challengeDone ? 'checked' : ''} class="h-3.5 w-3.5 rounded border-slate-600 bg-slate-950 text-amber-500" />
+                <span>Challenge: ${m.challenge}</span>
+              </label>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="text-right">
+                <div class="text-[10px] uppercase tracking-wider text-slate-400">Scratch / Net</div>
+                <div class="text-xl font-extrabold text-white">${sum.total} <span class="text-emerald-400 text-base">(${sum.total + hcp})</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Entry Mode Switcher -->
+          <div class="flex flex-wrap items-center justify-between gap-2 border-y border-slate-800 py-2.5">
+            <div class="inline-flex rounded-xl border border-slate-700 bg-slate-950 p-0.5 text-xs font-semibold">
+              <button type="button" data-entry-mode="keypad" class="rounded-lg px-3 py-1 ${state.entryMode === 'keypad' ? 'bg-amber-500 text-slate-950 font-bold' : 'text-slate-400 hover:text-white'}">Pin Count (0–10)</button>
+              <button type="button" data-entry-mode="pins" class="rounded-lg px-3 py-1 ${state.entryMode === 'pins' ? 'bg-amber-500 text-slate-950 font-bold' : 'text-slate-400 hover:text-white'}">Track Exact Pins</button>
+              <button type="button" data-entry-mode="screen" class="rounded-lg px-3 py-1 ${state.entryMode === 'screen' ? 'bg-amber-500 text-slate-950 font-bold' : 'text-slate-400 hover:text-white'}">Lane Screen Total</button>
+            </div>
+            <div class="text-xs font-bold text-amber-400">
+              Frame ${state.playFrameIdx + 1} · Ball ${state.currentBall + 1}
+              ${fr.b1 !== null ? `<span class="ml-2 text-slate-300">[B1: ${fr.b1}${fr.b2 !== null ? `, B2: ${fr.b2}` : ''}${fr.b3 !== null ? `, B3: ${fr.b3}` : ''}]</span>` : ''}
+            </div>
+          </div>
+
+          <!-- Mode A: Quick Pin Count Keypad (0..10) -->
+          ${state.entryMode === 'keypad' ? `
+            <div class="space-y-3">
+              <div class="text-xs text-slate-400">Tap how many pins went down on <strong class="text-white">Ball ${state.currentBall + 1}</strong>:</div>
+              <div class="grid grid-cols-6 gap-2 sm:grid-cols-11">
+                ${Array.from({ length: remainingPinsCount + 1 }, (_, n) => {
+                  const isStrike = state.currentBall === 0 && (n === 10 || (game.id === 'no_tap_9' && n === 9));
+                  const isSpare = state.currentBall === 1 && n === remainingPinsCount && remainingPinsCount < 10;
+                  const label = n === 0 ? '0' : isStrike ? (n === 10 ? 'X' : '9(X)') : isSpare ? '/' : String(n);
+                  return `
+                    <button type="button" data-keypad-val="${n}" class="rounded-xl border py-2.5 text-sm font-extrabold transition ${
+                      n === 0
+                        ? 'border-rose-500/40 bg-rose-950/30 text-rose-300 hover:bg-rose-900/40'
+                        : isStrike
+                        ? 'border-emerald-500/50 bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30'
+                        : isSpare
+                        ? 'border-violet-500/50 bg-violet-500/20 text-violet-300 hover:bg-violet-500/30'
+                        : 'border-slate-700 bg-slate-950 text-white hover:border-amber-500'
+                    }">${label}</button>
+                  `;
+                }).join('')}
+              </div>
+              <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+                <label class="inline-flex items-center gap-2 text-xs text-sky-300 cursor-pointer">
+                  <input type="checkbox" id="keypadSplitToggle" ${fr.split ? 'checked' : ''} class="h-4 w-4 rounded border-slate-600 bg-slate-950 text-sky-500" />
+                  <span>Ball 1 left a Split?</span>
+                </label>
+                <button type="button" id="clearFrameBtn" class="text-xs text-slate-400 hover:text-white underline">Clear This Frame</button>
+              </div>
+            </div>
+          ` : ''}
+
+          <!-- Mode B: Expandable 10-Pin Visual Rack -->
+          ${state.entryMode === 'pins' ? `
+            <div class="space-y-3">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <span class="text-xs text-slate-400">Tap the exact pins knocked down on <strong class="text-white">Ball ${state.currentBall + 1}</strong>:</span>
+                <div class="flex gap-1.5">
+                  <button type="button" data-pin-quick="all" class="rounded-lg bg-emerald-500/20 border border-emerald-500/40 px-2.5 py-1 text-xs font-bold text-emerald-300">All Standing</button>
+                  <button type="button" data-pin-quick="none" class="rounded-lg bg-rose-500/20 border border-rose-500/40 px-2.5 py-1 text-xs font-bold text-rose-300">Gutter (0)</button>
+                  <button type="button" data-pin-quick="commit" class="rounded-lg bg-amber-500 px-3 py-1 text-xs font-extrabold text-slate-950">Record Ball ✓</button>
+                </div>
+              </div>
+              <div class="flex flex-col items-center gap-2 py-2 rounded-xl bg-slate-950 border border-slate-800">
+                ${pinRows.map(row => `
+                  <div class="flex gap-2.5">
+                    ${row.map(pin => {
+                      const avail = standingPins.includes(pin);
+                      const knocked = curPinsArr.includes(pin);
+                      return `
+                        <button type="button" data-pin-tap="${pin}" ${!avail ? 'disabled' : ''} class="h-9 w-9 rounded-full text-xs font-extrabold border transition ${
+                          !avail
+                            ? 'border-slate-800 bg-slate-900 text-slate-700 opacity-35 cursor-not-allowed'
+                            : knocked
+                            ? 'border-amber-400 bg-amber-500 text-slate-950 shadow'
+                            : 'border-slate-600 bg-slate-800 text-white hover:border-amber-400'
+                        }">${pin}</button>
+                      `;
+                    }).join('')}
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+
+          <!-- Mode C: Lane Screen Total Shortcut -->
+          ${state.entryMode === 'screen' ? `
+            <div class="grid grid-cols-2 gap-3 sm:grid-cols-5">
+              <div>
+                <label class="block text-[10px] uppercase font-bold text-slate-400">Screen Score</label>
+                <input id="manualTotalInput" type="number" min="0" max="300" value="${ls.manualTotal ?? getAvg(m)}" class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm font-extrabold text-white" />
+              </div>
+              <div>
+                <label class="block text-[10px] uppercase font-bold text-emerald-400">Strikes (X)</label>
+                <input data-mstat="strikes" type="number" min="0" max="12" value="${ls.manualStats.strikes}" class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm font-bold text-white" />
+              </div>
+              <div>
+                <label class="block text-[10px] uppercase font-bold text-violet-400">Spares (/)</label>
+                <input data-mstat="spares" type="number" min="0" max="10" value="${ls.manualStats.spares}" class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm font-bold text-white" />
+              </div>
+              <div>
+                <label class="block text-[10px] uppercase font-bold text-rose-400">Gutters (0)</label>
+                <input data-mstat="gutters" type="number" min="0" max="20" value="${ls.manualStats.gutters}" class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm font-bold text-white" />
+              </div>
+              <div>
+                <label class="block text-[10px] uppercase font-bold text-sky-400">Splits</label>
+                <input data-mstat="splits" type="number" min="0" max="10" value="${ls.manualStats.splits}" class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm font-bold text-white" />
+              </div>
+            </div>
+          ` : ''}
+
+          <!-- 10-Frame Strip for Active Bowler -->
+          <div class="grid grid-cols-5 gap-1.5 sm:grid-cols-10">
+            ${ls.frames.map((f, idx) => {
+              const b1s = f.b1 === null ? '' : (f.b1 === 10 || (game.id === 'no_tap_9' && f.b1 === 9) ? 'X' : (f.b1 === 0 ? '-' : f.b1));
+              const b2s = f.b2 === null ? '' : ((f.b1 || 0) + f.b2 >= 10 && idx < 9 ? '/' : (f.b2 === 0 ? '-' : f.b2));
+              return `
+                <button type="button" data-jump-frame="${idx}" class="rounded-lg border p-1.5 text-center text-[11px] ${
+                  idx === state.playFrameIdx ? 'border-amber-500 bg-amber-500/15 text-amber-300 font-bold' : 'border-slate-800 bg-slate-950 text-slate-400 hover:border-slate-600'
+                }">
+                  <div class="text-[9px] opacity-75">F${idx + 1}</div>
+                  <div class="font-extrabold text-white h-4">${b1s || '·'} ${b2s}</div>
+                </button>
+              `;
+            }).join('')}
+          </div>
+
+          <!-- Turn Actions: Skip Bowler vs Next Bowler -->
+          <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+            <button type="button" id="skipBowlerBtn" class="rounded-xl border border-sky-500/40 bg-sky-950/40 px-4 py-2 text-xs font-bold text-sky-300 hover:bg-sky-900/50">
+              Skip ${m.name} (Away / Bathroom)
+            </button>
+            <button type="button" id="nextBowlerBtn" class="rounded-xl bg-amber-500 px-5 py-2.5 text-sm font-extrabold text-slate-950 hover:bg-amber-400">
+              Done — Next Bowler →
+            </button>
+          </div>
+        `;
+      }
+
+      function renderGamesScreen() {
+        document.getElementById('gameStylesGrid').innerHTML = GAME_STYLES.map(g => {
+          const active = g.id === state.activeGameId;
+          return `
+            <div class="rounded-xl border p-4 flex flex-col justify-between ${active ? 'border-amber-500 bg-amber-500/10' : 'border-slate-800 bg-slate-950'}">
+              <div>
+                <div class="flex items-center justify-between gap-2">
+                  <h3 class="text-base font-bold text-white">${g.name}</h3>
+                  <span class="rounded-full px-2 py-0.5 text-[10px] font-bold ${g.kidFriendly ? 'bg-sky-500/20 text-sky-300' : 'bg-slate-800 text-slate-400'}">${g.kidFriendly ? 'Kid-Friendly' : 'Adults / Competitive'}</span>
+                </div>
+                <p class="mt-2 text-xs text-slate-300 leading-relaxed">${g.summary}</p>
+              </div>
+              <div class="mt-4">
+                <button type="button" data-select-game="${g.id}" class="w-full rounded-lg py-2 text-xs font-extrabold transition ${
+                  active ? 'bg-amber-500 text-slate-950' : 'border border-slate-700 bg-slate-900 text-slate-200 hover:bg-slate-800'
+                }">${active ? 'Active Tonight ✓' : 'Select for Tonight'}</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        document.getElementById('challengesGrid').innerHTML = state.members.map(m => `
+          <div class="rounded-xl border border-slate-800 bg-slate-950 p-3.5">
+            <div class="text-sm font-bold text-white">${m.name}</div>
+            <div class="mt-1 text-xs text-amber-300">${m.challenge}</div>
+          </div>
+        `).join('');
+      }
+
+      function buildWedgeWheelSvg(wedges, sizeClass = 'h-20 w-20') {
+        const cx = 42, cy = 42, r = 36;
+        let paths = '';
+        WEDGE_CATEGORIES.forEach((cat, idx) => {
+          const stars = Math.min(5, Math.max(0, Number(wedges[cat.id] || 0)));
+          const filled = stars >= 5;
+          const rad1 = ((-90 + idx * 72) * Math.PI) / 180;
+          const rad2 = ((-90 + idx * 72 + 66) * Math.PI) / 180;
+          const x1 = (cx + r * Math.cos(rad1)).toFixed(1), y1 = (cy + r * Math.sin(rad1)).toFixed(1);
+          const x2 = (cx + r * Math.cos(rad2)).toFixed(1), y2 = (cy + r * Math.sin(rad2)).toFixed(1);
+          const opacity = filled ? '1' : (0.18 + stars * 0.12).toFixed(2);
+          paths += `<path d="M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 0 1 ${x2} ${y2} Z" fill="${cat.color}" fill-opacity="${opacity}" stroke="#2b1a10" stroke-width="1.5" />`;
+        });
+        return `<svg viewBox="0 0 84 84" class="${sizeClass} shrink-0">${paths}<circle cx="${cx}" cy="${cy}" r="10" fill="#fff9ec" stroke="#2b1a10" stroke-width="2" /></svg>`;
+      }
+
+      function renderStandingsScreen() {
+        const shiftEl = document.getElementById('hcpShiftBanner');
+        if (shiftEl) {
+          if (state.lastHcpShifts && state.lastHcpShifts.length > 0) {
+            shiftEl.classList.remove('hidden');
+            shiftEl.innerHTML = `<div class="font-bold text-amber-300 mb-1">Latest Post-Night Handicap Adjustments (${Math.round((state.hcpPct || 0.8) * 100)}% of ${state.hcpBasis} · ${state.hcpWindow === 'rolling6' ? 'Rolling 6 Games' : 'Season Avg'}):</div><div class="flex flex-wrap gap-2">${state.lastHcpShifts.map(s => `<span class="rounded-lg bg-slate-950 border border-slate-800 px-2.5 py-1 text-[11px] text-slate-200"><strong>${s.name}:</strong> +${s.prevHcp} → <strong class="${s.delta < 0 ? 'text-emerald-400' : s.delta > 0 ? 'text-sky-400' : 'text-slate-300'}">+${s.newHcp}</strong> (${s.delta > 0 ? '+' + s.delta : s.delta})</span>`).join('')}</div>`;
+          } else {
+            shiftEl.classList.add('hidden');
+          }
+        }
+        const sorted = [...state.members].sort((a, b) => getNetAvg(b) - getNetAvg(a));
+        document.getElementById('standingsBody').innerHTML = sorted.map((m, i) => `
+          <tr class="hover:bg-slate-800/40">
+            <td class="py-2.5 pr-3 font-bold text-amber-400">#${i + 1}</td>
+            <td class="py-2.5 pr-3">
+              <button type="button" data-open-player="${m.id}" class="font-bold text-white hover:text-amber-400 underline decoration-slate-700 underline-offset-2">${m.name}</button>
+              ${(m.isKid || m.tag) ? `<div class="text-[11px] text-slate-400">${m.isKid ? 'Kid/Guest' : m.tag}</div>` : ''}
+            </td>
+            <td class="py-2.5 pr-3 text-right text-slate-300">${m.games}</td>
+            <td class="py-2.5 pr-3 text-right font-semibold text-white">${getAvg(m)}</td>
+            <td class="py-2.5 pr-3 text-right font-semibold text-amber-400">+${getHandicap(m)}</td>
+            <td class="py-2.5 pr-3 text-right font-semibold text-emerald-400">${m.highGame}</td>
+            <td class="py-2.5 text-right text-slate-300">${m.wins}-${m.losses}</td>
+          </tr>
+        `).join('');
+
+        const teamWrap = document.getElementById('teamStandingsWrap');
+        if (teamWrap) {
+          const teamList = Object.entries(state.teamStats || {}).map(([key, ts]) => {
+            const avg = ts.games > 0 ? Math.round(ts.totalPins / ts.games) : 0;
+            const hcp = Number(state.hcpBasis) > 0 ? Math.max(0, Math.round((Number(state.hcpBasis) - avg) * (state.hcpPct || 0.8))) : 0;
+            return { key, ...ts, avg, hcp, net: avg + hcp };
+          }).sort((a, b) => b.net - a.net);
+
+          teamWrap.innerHTML = teamList.length ? `
+            <table class="w-full min-w-[480px] text-left text-xs">
+              <thead>
+                <tr class="border-b border-slate-800 text-[11px] uppercase tracking-wider text-slate-400">
+                  <th class="pb-2 pr-3">Team Pair</th>
+                  <th class="pb-2 pr-3 text-right">Games</th>
+                  <th class="pb-2 pr-3 text-right">Raw Avg</th>
+                  <th class="pb-2 pr-3 text-right">Team Hcp</th>
+                  <th class="pb-2 pr-3 text-right">Team Net</th>
+                  <th class="pb-2 pr-3 text-right">High</th>
+                  <th class="pb-2 text-right">W-L</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800/70">
+                ${teamList.map(t => `
+                  <tr>
+                    <td class="py-2 pr-3 font-bold text-white">${t.label}</td>
+                    <td class="py-2 pr-3 text-right text-slate-300">${t.games}</td>
+                    <td class="py-2 pr-3 text-right font-semibold text-white">${t.avg}</td>
+                    <td class="py-2 pr-3 text-right font-bold text-amber-400">+${t.hcp}</td>
+                    <td class="py-2 pr-3 text-right font-bold text-emerald-400">${t.net}</td>
+                    <td class="py-2 pr-3 text-right text-slate-300">${t.highGame}</td>
+                    <td class="py-2 text-right text-slate-300">${t.wins}-${t.losses}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          ` : '<div class="text-xs text-slate-500">Finish a Scotch Doubles game to record team pair handicaps.</div>';
+        }
+
+        const ctx = document.getElementById('trendChart');
+        if (ctx && typeof Chart !== 'undefined' && state.activeScreen === 'standings') {
+          const maxLen = Math.max(1, ...state.members.map(m => m.history.length));
+          const labels = Array.from({ length: maxLen }, (_, i) => `G${i + 1}`);
+          const colors = ['#d9531e', '#1d7874', '#b8292f', '#3a7d44', '#e39b18', '#7c3f58', '#5c3a21', '#2b59c3'];
+          if (trendChartInstance) trendChartInstance.destroy();
+          trendChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels,
+              datasets: state.members.filter(m => m.history.length > 0).map((m, idx) => ({
+                label: m.name,
+                data: m.history,
+                borderColor: colors[idx % colors.length],
+                backgroundColor: colors[idx % colors.length],
+                tension: 0.3,
+                borderWidth: 2,
+                pointRadius: 3
+              }))
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { labels: { color: '#2b1a10', font: { size: 11, weight: 'bold' } } } },
+              scales: {
+                x: { ticks: { color: '#5c3a21' }, grid: { color: '#e5d3b3' } },
+                y: { ticks: { color: '#5c3a21' }, grid: { color: '#e5d3b3' } }
+              }
+            }
+          });
+        }
+
+        document.getElementById('historyList').innerHTML = state.sessionLogs.map(l => `
+          <div class="rounded-xl border border-slate-800 bg-slate-950 p-3">
+            <div class="text-xs font-bold text-amber-400">${l.date} · ${l.game}</div>
+            <div class="mt-1 text-xs text-slate-200">${l.summary}</div>
+          </div>
+        `).join('');
+      }
+
+      function renderPlayerProfileScreen() {
+        const m = state.members.find(x => x.id === state.viewingPlayerId) || state.members[0];
+        if (!m) return;
+        const wedges = m.wedges || { overall: 0, strikes: 0, gutters: 0, splits: 0, spares: 0 };
+        document.getElementById('playerProfileContent').innerHTML = `
+          <div class="rounded-2xl border border-slate-800 bg-slate-900 p-5">
+            <div class="flex flex-wrap items-center gap-4">
+              ${buildWedgeWheelSvg(wedges, 'h-24 w-24')}
+              <div>
+                <div class="flex flex-wrap items-center gap-2.5">
+                  <h2 class="text-2xl font-extrabold text-white">${m.name}</h2>
+                  <button type="button" data-edit-player="${m.id}" class="rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1 text-xs font-bold text-amber-300 hover:bg-slate-700">Edit Bowler</button>
+                </div>
+                <p class="text-xs text-slate-400 mt-0.5">${m.email ? `<span class="text-sky-300">${m.email}</span> · ` : ''}${m.isKid ? 'Kid / Guest · ' : ''}${m.tag ? `${m.tag} · ` : ''}Active Challenge: <span class="text-amber-300">${m.challenge}</span></p>
+                <div class="mt-3 flex flex-wrap gap-2 text-xs">
+                  <span class="rounded-lg bg-slate-950 border border-slate-800 px-3 py-1">Avg: <strong class="text-white">${getAvg(m)}</strong></span>
+                  <span class="rounded-lg bg-slate-950 border border-slate-800 px-3 py-1">Handicap: <strong class="text-amber-400">+${getHandicap(m)}</strong></span>
+                  <span class="rounded-lg bg-slate-950 border border-slate-800 px-3 py-1">High Game: <strong class="text-emerald-400">${m.highGame}</strong></span>
+                  <span class="rounded-lg bg-slate-950 border border-slate-800 px-3 py-1">Record: <strong class="text-white">${m.wins}-${m.losses}</strong></span>
+                </div>
+              </div>
+            </div>
+            <div class="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-5">
+              ${WEDGE_CATEGORIES.map(c => {
+                const cnt = Math.min(5, wedges[c.id] || 0);
+                return `
+                  <div class="rounded-xl border border-slate-800 bg-slate-950 p-3">
+                    <div class="text-xs font-bold text-white">${c.short}</div>
+                    <div class="mt-1 tracking-widest text-sm" style="color:${c.color}">${'★'.repeat(cnt)}${'☆'.repeat(5 - cnt)}</div>
+                    <div class="mt-0.5 text-[10px] text-slate-400">${cnt >= 5 ? c.title + ' ✓' : `${cnt}/5 stars`}</div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      function renderWedgesScreen() {
+        document.getElementById('reigningChampDisplay').textContent = `${state.reigningChamp} (Format & Lane Perk)`;
+        document.getElementById('wedgeLegendGrid').innerHTML = WEDGE_CATEGORIES.map(c => `
+          <div class="rounded-xl border border-slate-800 bg-slate-950 p-3">
+            <div class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full" style="background:${c.color}"></span><span class="text-xs font-bold text-white">${c.name}</span></div>
+            <div class="mt-1 text-[11px] font-semibold" style="color:${c.color}">5★ ${c.title}</div>
+            <div class="text-[10px] text-slate-400">${c.perk}</div>
+          </div>
+        `).join('');
+
+        document.getElementById('wedgeCardsGrid').innerHTML = state.members.map(m => {
+          const w = m.wedges || { overall: 0, strikes: 0, gutters: 0, splits: 0, spares: 0 };
+          const total = WEDGE_CATEGORIES.reduce((s, c) => s + Math.min(5, w[c.id] || 0), 0);
+          return `
+            <div class="rounded-2xl border border-slate-800 bg-slate-900 p-4">
+              <div class="flex items-center gap-3">
+                ${buildWedgeWheelSvg(w)}
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center justify-between">
+                    <button type="button" data-open-player="${m.id}" class="text-base font-extrabold text-white hover:text-amber-400">${m.name}</button>
+                    <span class="rounded-full bg-slate-800 px-2 py-0.5 text-[11px] font-bold text-amber-400">${total}/25 ★</span>
+                  </div>
+                  <div class="mt-1 space-y-1">
+                    ${WEDGE_CATEGORIES.map(c => {
+                      const cnt = Math.min(5, w[c.id] || 0);
+                      return `<div class="flex items-center justify-between text-[11px]"><span class="text-slate-400">${c.short}</span><span style="color:${c.color}">${'★'.repeat(cnt)}${'☆'.repeat(5 - cnt)}</span></div>`;
+                    }).join('')}
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      function renderBudgetScreen() {
+        const urlInput = document.getElementById('webAppUrlInput');
+        if (urlInput) urlInput.value = state.webAppUrl || '';
+        const linksEl = document.getElementById('adminPersonalLinksList');
+        if (linksEl) {
+          linksEl.innerHTML = state.members.map(m => `
+            <button type="button" data-copy-link="${m.id}" class="rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-1 text-[11px] font-semibold text-sky-300 hover:border-sky-400">Copy ${m.name}'s Link</button>
+          `).join('');
+        }
+        const b = state.privateBudget;
+        const spent = b.expenses.reduce((s, e) => s + Number(e.amount || 0), 0);
+        const rem = Number(b.monthlyCap || 0) - spent;
+        document.getElementById('budgetCapInput').value = b.monthlyCap;
+        document.getElementById('budgetSpentTotal').textContent = `$${spent}`;
+        const remEl = document.getElementById('budgetRemaining');
+        remEl.textContent = rem >= 0 ? `$${rem}` : `-$${Math.abs(rem)}`;
+        remEl.className = `mt-1.5 text-xl font-extrabold ${rem >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+
+        document.getElementById('budgetExpensesList').innerHTML = b.expenses.map(e => `
+          <div class="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-xs">
+            <div><span class="font-bold text-amber-400">${e.date}</span> · <span class="text-slate-200">${e.desc}</span></div>
+            <div class="flex items-center gap-3">
+              <span class="font-extrabold text-white">$${e.amount}</span>
+              <button type="button" data-del-exp="${e.id}" class="text-rose-400 hover:text-rose-300 font-bold">✕</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      function renderAll() {
+        renderHeader();
+        renderCheckinScreen();
+        renderPlayScreen();
+        renderGamesScreen();
+        renderStandingsScreen();
+        renderPlayerProfileScreen();
+        renderWedgesScreen();
+        renderBudgetScreen();
+      }
+
+      // --- MODAL HELPER ---
+      let modalConfirmCb = null;
+      function openModal({ title, body, contentHtml = '', confirmLabel = 'Confirm', onConfirm }) {
+        document.getElementById('modalTitle').textContent = title;
+        document.getElementById('modalBody').textContent = body;
+        document.getElementById('modalCustomContent').innerHTML = contentHtml;
+        document.getElementById('modalConfirmBtn').textContent = confirmLabel;
+        modalConfirmCb = onConfirm;
+        const b = document.getElementById('modalBackdrop');
+        b.classList.remove('hidden');
+        b.classList.add('flex');
+      }
+      function closeModal() {
+        const b = document.getElementById('modalBackdrop');
+        b.classList.add('hidden');
+        b.classList.remove('flex');
+        modalConfirmCb = null;
+      }
+      document.getElementById('modalCancelBtn').addEventListener('click', closeModal);
+      document.getElementById('modalConfirmBtn').addEventListener('click', () => {
+        if (modalConfirmCb && modalConfirmCb() === false) return;
+        closeModal();
+      });
+
+      function openRegisterModal(defaultKid = false, prefillEmail = '') {
+        openModal({
+          title: defaultKid ? 'Add Kid or Guest Bowler' : 'Register with Email / Gmail',
+          body: 'Enter a name and Gmail/email address to join the crew, RSVP for dates, and track stats.',
+          confirmLabel: 'Register & Check In',
+          contentHtml: `
+            <div class="space-y-3">
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-400 mb-1">Bowler Name</label>
+                <input id="regName" type="text" placeholder="e.g., Walter, Alex" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-400 mb-1">Gmail / Email Account</label>
+                <input id="regEmail" type="email" value="${prefillEmail}" placeholder="name@gmail.com (optional for kids)" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white" />
+              </div>
+              <div class="grid grid-cols-2 gap-2.5">
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-400 mb-1">Tag / Note</label>
+                  <input id="regTag" type="text" placeholder="e.g., Neighbor, Guitar" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white" />
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-400 mb-1">Starting Avg</label>
+                  <input id="regAvg" type="number" min="40" max="250" value="${defaultKid ? 85 : 130}" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white" />
+                </div>
+              </div>
+              <label class="flex items-center gap-2 text-xs text-amber-300 cursor-pointer">
+                <input id="regRemind48h" type="checkbox" checked class="h-4 w-4 rounded border-slate-600 bg-slate-950 text-amber-500" />
+                <span>Send me an email reminder 48 hours before bowling (requires email)</span>
+              </label>
+              <label class="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
+                <input id="regIsKid" type="checkbox" ${defaultKid ? 'checked' : ''} class="h-4 w-4 rounded border-slate-600 bg-slate-950 text-sky-500" />
+                <span>Kid / Guest bowler</span>
+              </label>
+            </div>
+          `,
+          onConfirm: () => {
+            const name = document.getElementById('regName').value.trim();
+            if (!name) { showToast('Please enter a name.'); return false; }
+            const email = document.getElementById('regEmail').value.trim().toLowerCase();
+            if (email && state.members.some(m => (m.email || '').toLowerCase() === email)) {
+              showToast('That email is already registered — use Sign In instead.');
+              return false;
+            }
+            const isKid = document.getElementById('regIsKid').checked;
+            const tag = document.getElementById('regTag').value.trim();
+            const startAvg = Math.max(40, Math.min(250, Number(document.getElementById('regAvg').value) || (isKid ? 85 : 130)));
+            const id = 'p_' + Date.now();
+            const rsvps = { [state.selectedDateId]: 'in' };
+            state.members.push({
+              id, name, email, remind48h: !!(email && document.getElementById('regRemind48h')?.checked), tag, isKid, rsvps,
+              vote: isKid ? 'family_mix' : 'scotch_doubles',
+              challenge: CHALLENGE_POOL[state.members.length % CHALLENGE_POOL.length],
+              games: 1, totalPins: startAvg, highGame: startAvg, wins: 0, losses: 0, history: [startAvg],
+              wedges: { overall: 0, strikes: 0, gutters: 0, splits: 0, spares: 0 }
+            });
+            if (email) state.signedInMemberId = id;
+            generateMatchups(false);
+            saveState();
+            renderAll();
+            showToast(`${name} registered and checked IN!`);
+          }
+        });
+      }
+
+      function openEditPlayerModal(memberId) {
+        const m = state.members.find(x => x.id === memberId);
+        if (!m) return;
+        openModal({
+          title: `Edit Bowler — ${m.name}`,
+          body: 'Update name, Gmail/email account, tag, baseline average, or remove this bowler from the roster.',
+          confirmLabel: 'Save Changes',
+          contentHtml: `
+            <div class="space-y-3">
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-400 mb-1">Bowler Name</label>
+                <input id="editName" type="text" value="${m.name}" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-400 mb-1">Gmail / Email Account</label>
+                <input id="editEmail" type="email" value="${m.email || ''}" placeholder="name@gmail.com" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white" />
+              </div>
+              <div class="grid grid-cols-2 gap-2.5">
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-400 mb-1">Notes (Optional)</label>
+                  <input id="editTag" type="text" value="${m.tag || ''}" placeholder="Leave blank to hide" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white" />
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-400 mb-1">Current Avg</label>
+                  <input id="editAvg" type="number" min="40" max="250" value="${getAvg(m)}" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white" />
+                </div>
+              </div>
+              <label class="flex items-center gap-2 text-xs text-amber-300 cursor-pointer">
+                <input id="editRemind48h" type="checkbox" ${m.remind48h ? 'checked' : ''} class="h-4 w-4 rounded border-slate-600 bg-slate-950 text-amber-500" />
+                <span>Opt in to 48-hour email reminders (requires email above)</span>
+              </label>
+              <label class="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
+                <input id="editIsKid" type="checkbox" ${m.isKid ? 'checked' : ''} class="h-4 w-4 rounded border-slate-600 bg-slate-950 text-sky-500" />
+                <span>Kid / Guest bowler</span>
+              </label>
+              <div class="border-t border-slate-800 pt-3 flex items-center justify-between">
+                <span class="text-[11px] text-slate-400">No longer bowling with the crew?</span>
+                <button id="deletePlayerInlineBtn" type="button" class="rounded-lg border border-rose-700/60 bg-rose-950/50 px-3 py-1.5 text-xs font-bold text-rose-300 hover:bg-rose-900/60">Remove Bowler</button>
+              </div>
+            </div>
+          `,
+          onConfirm: () => {
+            const name = document.getElementById('editName').value.trim();
+            if (!name) { showToast('Name cannot be empty.'); return false; }
+            const email = document.getElementById('editEmail').value.trim().toLowerCase();
+            if (email && state.members.some(other => other.id !== m.id && (other.email || '').toLowerCase() === email)) {
+              showToast('Another bowler already uses that email.');
+              return false;
+            }
+            const newAvg = Math.max(40, Math.min(250, Number(document.getElementById('editAvg').value) || getAvg(m)));
+            m.name = name;
+            m.email = email;
+            m.remind48h = !!(email && document.getElementById('editRemind48h')?.checked);
+            m.tag = document.getElementById('editTag').value.trim();
+            m.isKid = document.getElementById('editIsKid').checked;
+            if (newAvg !== getAvg(m)) {
+              const gCount = Math.max(1, m.games || 1);
+              m.games = gCount;
+              m.totalPins = newAvg * gCount;
+            }
+            generateMatchups(false);
+            saveState();
+            renderAll();
+            showToast(`Updated ${m.name}!`);
+          }
+        });
+
+        const delBtn = document.getElementById('deletePlayerInlineBtn');
+        if (delBtn) {
+          delBtn.addEventListener('click', () => {
+            if (state.members.length <= 2) {
+              showToast('Keep at least 2 bowlers on the roster.');
+              return;
+            }
+            state.members = state.members.filter(x => x.id !== memberId);
+            if (state.signedInMemberId === memberId) state.signedInMemberId = null;
+            if (state.activeBowlerId === memberId) state.activeBowlerId = state.members[0]?.id || null;
+            generateMatchups(false);
+            saveState();
+            closeModal();
+            if (state.activeScreen === 'player') switchScreen('checkin');
+            else renderAll();
+            showToast(`Removed ${m.name} from roster.`);
+          });
+        }
+      }
+
+      function openSignInModal() {
+        const current = state.members.find(m => m.id === state.signedInMemberId);
+        openModal({
+          title: 'Sign In with Email / Gmail',
+          body: 'Enter the email you registered with to sign in (or pick your name below to link your email).',
+          confirmLabel: 'Sign In',
+          contentHtml: `
+            <div class="space-y-3">
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-400 mb-1">Your Email / Gmail</label>
+                <input id="signInEmail" type="email" value="${current?.email || ''}" placeholder="you@gmail.com" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-400 mb-1">Or link to an existing bowler profile</label>
+                <select id="signInMemberSelect" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white">
+                  <option value="">— Match by email automatically —</option>
+                  ${state.members.map(m => `<option value="${m.id}" ${m.id === state.signedInMemberId ? 'selected' : ''}>${m.name}${m.email ? ' (' + m.email + ')' : ''}</option>`).join('')}
+                </select>
+              </div>
+            </div>
+          `,
+          onConfirm: () => {
+            const email = document.getElementById('signInEmail').value.trim().toLowerCase();
+            const pickedId = document.getElementById('signInMemberSelect').value;
+
+            if (pickedId) {
+              const target = state.members.find(m => m.id === pickedId);
+              if (target) {
+                if (email) target.email = email;
+                state.signedInMemberId = target.id;
+                saveState();
+                renderAll();
+                showToast(`Signed in as ${target.name}${target.email ? ' (' + target.email + ')' : ''}!`);
+                return;
+              }
+            }
+
+            if (!email) {
+              showToast('Enter your email or pick a bowler profile.');
+              return false;
+            }
+
+            const matched = state.members.find(m => (m.email || '').toLowerCase() === email);
+            if (matched) {
+              state.signedInMemberId = matched.id;
+              saveState();
+              renderAll();
+              showToast(`Welcome back, ${matched.name}!`);
+            } else {
+              closeModal();
+              openRegisterModal(false, email);
+              return false;
+            }
+          }
+        });
+      }
+
+      // --- GLOBAL & SCREEN EVENT LISTENERS ---
+      document.querySelectorAll('.nav-btn, .mnav-btn').forEach(btn => {
+        btn.addEventListener('click', () => switchScreen(btn.getAttribute('data-screen')));
+      });
+
+      const viewToggleBtn = document.getElementById('viewModeToggleBtn');
+      if (viewToggleBtn) {
+        viewToggleBtn.addEventListener('click', () => {
+          const isMobile = document.body.classList.toggle('mobile-view');
+          viewToggleBtn.textContent = isMobile ? '🖥 Desktop' : '📱 Mobile';
+          if (state.activeScreen === 'standings') renderStandingsScreen();
+        });
+      }
+
+      document.getElementById('openSignInBtn').addEventListener('click', () => openSignInModal());
+      document.getElementById('openRegisterBtn').addEventListener('click', () => openRegisterModal(false));
+      document.getElementById('addKidQuickBtn').addEventListener('click', () => openRegisterModal(true));
+
+      document.getElementById('openAdminBudgetBtn').addEventListener('click', () => {
+        const me = state.members.find(m => m.id === state.signedInMemberId);
+        if (me && (me.isAdmin || me.id === 'curtis')) {
+          switchScreen('budget');
+          return;
+        }
+        openModal({
+          title: 'Admin Panel & Private Budget',
+          body: 'Restricted to the league administrator (Curtis). Enter Admin PIN (default: 1234) to unlock.',
+          confirmLabel: 'Unlock',
+          contentHtml: `<input id="pinInput" type="password" inputmode="numeric" placeholder="Enter PIN (1234)" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white" />`,
+          onConfirm: () => {
+            const val = document.getElementById('pinInput').value.trim();
+            if (val !== ADMIN_PIN) { showToast('Incorrect PIN (default is 1234).'); return false; }
+            switchScreen('budget');
+          }
+        });
+      });
+      document.getElementById('lockBudgetBtn').addEventListener('click', () => switchScreen('checkin'));
+
+      // Check-in Screen listeners
+      document.getElementById('hcpBasis').addEventListener('change', e => {
+        state.hcpBasis = Number(e.target.value);
+        generateMatchups(false);
+        saveState();
+        renderAll();
+      });
+      document.getElementById('hcpPctSelect').addEventListener('change', e => {
+        state.hcpPct = Number(e.target.value);
+        generateMatchups(false);
+        saveState();
+        renderAll();
+      });
+      document.getElementById('hcpWindowSelect').addEventListener('change', e => {
+        state.hcpWindow = e.target.value;
+        generateMatchups(false);
+        saveState();
+        renderAll();
+      });
+      document.getElementById('webAppUrlInput').addEventListener('change', e => {
+        state.webAppUrl = e.target.value.trim();
+        saveState();
+        showToast('Saved Web App URL for personal bowler links!');
+      });
+      document.getElementById('calPrevBtn').addEventListener('click', () => {
+        state.calMonth -= 1;
+        if (state.calMonth < 0) { state.calMonth = 11; state.calYear -= 1; }
+        saveState();
+        renderCheckinScreen();
+      });
+      document.getElementById('calNextBtn').addEventListener('click', () => {
+        state.calMonth += 1;
+        if (state.calMonth > 11) { state.calMonth = 0; state.calYear += 1; }
+        saveState();
+        renderCheckinScreen();
+      });
+      document.getElementById('setTimeSelect').addEventListener('change', e => {
+        state.setTime = e.target.value;
+        saveState();
+        renderAll();
+      });
+      document.getElementById('lanesAutoBtn').addEventListener('click', () => {
+        state.lanesMode = 'auto';
+        saveState();
+        renderCheckinScreen();
+      });
+      document.getElementById('lanes1Btn').addEventListener('click', () => {
+        if (getInPlayers().length > 6) {
+          showToast("7+ bowlers exceeds Medford Lanes' 6-person/lane free-shoe cap — using 2+ lanes.");
+          state.lanesMode = 'auto';
+        } else {
+          state.lanesMode = '1';
+        }
+        saveState();
+        renderCheckinScreen();
+      });
+      document.getElementById('lanes2Btn').addEventListener('click', () => {
+        state.lanesMode = '2';
+        saveState();
+        renderCheckinScreen();
+      });
+      document.getElementById('calendarGrid').addEventListener('click', e => {
+        const btn = e.target.closest('[data-cal-date]');
+        if (!btn) return;
+        state.selectedDateId = btn.getAttribute('data-cal-date');
+        generateMatchups(false);
+        saveState();
+        renderAll();
+      });
+      document.getElementById('selectedDateInfoCard').addEventListener('click', e => {
+        if (e.target.id !== 'toggleMyAvailBtn') return;
+        const me = state.members.find(m => m.id === state.signedInMemberId);
+        if (!me) return;
+        if (!me.rsvps) me.rsvps = {};
+        const cur = me.rsvps[state.selectedDateId] === 'in';
+        me.rsvps[state.selectedDateId] = cur ? 'out' : 'in';
+        generateMatchups(false);
+        saveState();
+        renderAll();
+      });
+      document.getElementById('rsvpList').addEventListener('click', e => {
+        const rsvpBtn = e.target.closest('[data-rsvp]');
+        if (rsvpBtn) {
+          const [id, st] = rsvpBtn.getAttribute('data-rsvp').split(':');
+          if (!isCurrentUserAdmin() && id !== state.signedInMemberId) {
+            showToast('You can only update your own RSVP.');
+            return;
+          }
+          const m = state.members.find(x => x.id === id);
+          if (m) {
+            if (!m.rsvps) m.rsvps = {};
+            m.rsvps[state.selectedDateId] = st;
+            generateMatchups(false);
+            saveState();
+            renderAll();
+          }
+          return;
+        }
+        const profBtn = e.target.closest('[data-open-player]');
+        if (profBtn) {
+          state.viewingPlayerId = profBtn.getAttribute('data-open-player');
+          switchScreen('player');
+        }
+      });
+      document.getElementById('rsvpList').addEventListener('change', e => {
+        const remindId = e.target.getAttribute('data-remind-toggle');
+        if (remindId) {
+          if (!isCurrentUserAdmin() && remindId !== state.signedInMemberId) return;
+          const m = state.members.find(x => x.id === remindId);
+          if (m && m.email) {
+            m.remind48h = e.target.checked;
+            saveState();
+            showToast(m.remind48h ? `48-hour email reminders ON for ${m.name}.` : `48-hour email reminders OFF for ${m.name}.`);
+          }
+          return;
+        }
+        const voteId = e.target.getAttribute('data-vote-game');
+        if (!voteId) return;
+        if (!isCurrentUserAdmin() && voteId !== state.signedInMemberId) return;
+        const m = state.members.find(x => x.id === voteId);
+        if (m) { m.vote = e.target.value; saveState(); renderCheckinScreen(); }
+      });
+      document.getElementById('allInBtn').addEventListener('click', () => {
+        const everyoneIn = state.members.length > 0 && getInPlayers().length === state.members.length;
+        const nextStatus = everyoneIn ? 'out' : 'in';
+        state.members.forEach(m => { if (!m.rsvps) m.rsvps = {}; m.rsvps[state.selectedDateId] = nextStatus; });
+        generateMatchups(false);
+        saveState();
+        renderAll();
+        showToast(everyoneIn ? 'Cleared RSVPs for this date.' : 'Everyone checked IN for this date!');
+      });
+      document.getElementById('shuffleMatchupsBtn').addEventListener('click', () => {
+        generateMatchups(true);
+        renderCheckinScreen();
+        showToast('Pairings reshuffled!');
+      });
+      document.getElementById('launchPlayBtn').addEventListener('click', () => switchScreen('play'));
+
+      // Shared game selection (Check-in Top 3 & Game Styles screen)
+      document.addEventListener('click', e => {
+        const gBtn = e.target.closest('[data-select-game]');
+        if (gBtn) {
+          state.activeGameId = gBtn.getAttribute('data-select-game');
+          generateMatchups(false);
+          saveState();
+          renderAll();
+          showToast(`Selected: ${getActiveGame().name}`);
+          return;
+        }
+        const copyBtn = e.target.closest('[data-copy-link]');
+        if (copyBtn) {
+          const id = copyBtn.getAttribute('data-copy-link');
+          const m = state.members.find(x => x.id === id);
+          const link = getPersonalLink(id);
+          copyTextSafe(link);
+          showToast(`Copied personal link for ${m ? m.name : id}: ${link}`);
+          return;
+        }
+        const editBtn = e.target.closest('[data-edit-player]');
+        if (editBtn) {
+          openEditPlayerModal(editBtn.getAttribute('data-edit-player'));
+          return;
+        }
+        const pBtn = e.target.closest('[data-open-player]');
+        if (pBtn && !e.target.closest('#rsvpList')) {
+          state.viewingPlayerId = pBtn.getAttribute('data-open-player');
+          switchScreen('player');
+        }
+      });
+
+      // Play Screen listeners
+      document.getElementById('playGameSelect').addEventListener('change', e => {
+        state.activeGameId = e.target.value;
+        generateMatchups(false);
+        saveState();
+        renderAll();
+      });
+      document.getElementById('newGameBtn').addEventListener('click', () => {
+        state.liveScores = {};
+        state.playFrameIdx = 0;
+        state.currentBall = 0;
+        state.skippedIds = [];
+        state.pendingReturnCheckId = null;
+        saveState();
+        renderPlayScreen();
+        showToast('Started fresh 10-frame game!');
+      });
+      document.getElementById('rotationQueueBar').addEventListener('click', e => {
+        const btn = e.target.closest('[data-play-pick]');
+        if (!btn) return;
+        state.activeBowlerId = btn.getAttribute('data-play-pick');
+        state.currentBall = 0;
+        renderPlayScreen();
+      });
+      document.getElementById('returnYesBtn').addEventListener('click', () => {
+        if (state.pendingReturnCheckId) {
+          const id = state.pendingReturnCheckId;
+          state.skippedIds = state.skippedIds.filter(x => x !== id);
+          state.activeBowlerId = id;
+          state.pendingReturnCheckId = null;
+          state.currentBall = 0;
+          saveState();
+          renderPlayScreen();
+        }
+      });
+      document.getElementById('returnNoBtn').addEventListener('click', () => {
+        state.pendingReturnCheckId = null;
+        saveState();
+        renderPlayScreen();
+      });
+
+      document.getElementById('activeBowlerCard').addEventListener('click', e => {
+        const m = state.members.find(x => x.id === state.activeBowlerId);
+        if (!m) return;
+        const ls = getLiveScore(m.id);
+        const fr = ls.frames[state.playFrameIdx];
+        const game = getActiveGame();
+
+        const modeBtn = e.target.closest('[data-entry-mode]');
+        if (modeBtn) {
+          state.entryMode = modeBtn.getAttribute('data-entry-mode');
+          saveState();
+          renderPlayScreen();
+          return;
+        }
+        const jumpBtn = e.target.closest('[data-jump-frame]');
+        if (jumpBtn) {
+          state.playFrameIdx = Number(jumpBtn.getAttribute('data-jump-frame'));
+          state.currentBall = 0;
+          renderPlayScreen();
+          return;
+        }
+        const keypadBtn = e.target.closest('[data-keypad-val]');
+        if (keypadBtn) {
+          const val = Number(keypadBtn.getAttribute('data-keypad-val'));
+          if (state.currentBall === 0) {
+            fr.b1 = val;
+            const isStrike = val === 10 || (game.id === 'no_tap_9' && val === 9);
+            if (isStrike && state.playFrameIdx < 9) {
+              fr.b2 = null;
+              saveState();
+              advanceToNextBowler();
+              return;
+            }
+            state.currentBall = 1;
+          } else if (state.currentBall === 1) {
+            fr.b2 = val;
+            const needThird = state.playFrameIdx === 9 && (fr.b1 === 10 || (fr.b1 || 0) + val >= 10);
+            if (needThird) {
+              state.currentBall = 2;
+            } else {
+              saveState();
+              advanceToNextBowler();
+              return;
+            }
+          } else {
+            fr.b3 = val;
+            saveState();
+            advanceToNextBowler();
+            return;
+          }
+          saveState();
+          renderPlayScreen();
+          return;
+        }
+
+        const pinTap = e.target.closest('[data-pin-tap]');
+        if (pinTap) {
+          const pin = Number(pinTap.getAttribute('data-pin-tap'));
+          const arr = state.currentBall === 0 ? fr.b1Pins : (state.currentBall === 1 ? fr.b2Pins : fr.b3Pins);
+          const idx = arr.indexOf(pin);
+          if (idx >= 0) arr.splice(idx, 1); else arr.push(pin);
+          renderPlayScreen();
+          return;
+        }
+        const pinQuick = e.target.closest('[data-pin-quick]');
+        if (pinQuick) {
+          const act = pinQuick.getAttribute('data-pin-quick');
+          const all = [1,2,3,4,5,6,7,8,9,10];
+          const standing = state.currentBall === 0 ? all : all.filter(p => !fr.b1Pins.includes(p));
+          if (act === 'all') {
+            if (state.currentBall === 0) fr.b1Pins = [...all];
+            else if (state.currentBall === 1) fr.b2Pins = [...standing];
+            else fr.b3Pins = [...all];
+            renderPlayScreen();
+          } else if (act === 'none') {
+            if (state.currentBall === 0) fr.b1Pins = [];
+            else if (state.currentBall === 1) fr.b2Pins = [];
+            else fr.b3Pins = [];
+            renderPlayScreen();
+          } else if (act === 'commit') {
+            if (state.currentBall === 0) {
+              fr.b1 = fr.b1Pins.length;
+              const rem = all.filter(p => !fr.b1Pins.includes(p));
+              if (isSplitLeave(rem)) fr.split = true;
+              if ((fr.b1 === 10 || (game.id === 'no_tap_9' && fr.b1 === 9)) && state.playFrameIdx < 9) {
+                saveState();
+                advanceToNextBowler();
+                return;
+              }
+              state.currentBall = 1;
+            } else if (state.currentBall === 1) {
+              fr.b2 = fr.b2Pins.length;
+              if (state.playFrameIdx === 9 && (fr.b1 === 10 || fr.b1 + fr.b2 >= 10)) {
+                state.currentBall = 2;
+              } else {
+                saveState();
+                advanceToNextBowler();
+                return;
+              }
+            } else {
+              fr.b3 = fr.b3Pins.length;
+              saveState();
+              advanceToNextBowler();
+              return;
+            }
+            saveState();
+            renderPlayScreen();
+          }
+          return;
+        }
+
+        if (e.target.id === 'clearFrameBtn') {
+          ls.frames[state.playFrameIdx] = { b1: null, b2: null, b3: null, b1Pins: [], b2Pins: [], b3Pins: [], split: false };
+          state.currentBall = 0;
+          saveState();
+          renderPlayScreen();
+          return;
+        }
+        if (e.target.id === 'skipBowlerBtn') {
+          if (!state.skippedIds.includes(m.id)) state.skippedIds.push(m.id);
+          showToast(`Skipped ${m.name} — we'll check if they're back before the round ends.`);
+          advanceToNextBowler();
+          return;
+        }
+        if (e.target.id === 'nextBowlerBtn') {
+          advanceToNextBowler();
+        }
+      });
+
+      document.getElementById('activeBowlerCard').addEventListener('change', e => {
+        const m = state.members.find(x => x.id === state.activeBowlerId);
+        if (!m) return;
+        const ls = getLiveScore(m.id);
+        if (e.target.id === 'keypadSplitToggle') {
+          ls.frames[state.playFrameIdx].split = e.target.checked;
+          saveState();
+        } else if (e.target.getAttribute('data-challenge-check')) {
+          ls.challengeDone = e.target.checked;
+          saveState();
+        } else if (e.target.id === 'manualTotalInput') {
+          ls.manualTotal = Math.max(0, Math.min(300, Number(e.target.value) || 0));
+          saveState();
+          renderPlayScreen();
+        } else if (e.target.getAttribute('data-mstat')) {
+          ls.manualStats[e.target.getAttribute('data-mstat')] = Math.max(0, Number(e.target.value) || 0);
+          saveState();
+        }
+      });
+
+      // Finish & Save Game (Auto-awards 5 Wedge Stars!)
+      document.getElementById('saveGameScoresBtn').addEventListener('click', () => {
+        const players = getInPlayers();
+        if (!players.length) return;
+        const entries = players.map(m => {
+          const sum = computeScoreSummary(m.id);
+          const net = sum.total + getHandicap(m);
+          return { member: m, scratch: sum.total, net, ...sum };
+        });
+
+        const maxNet = Math.max(...entries.map(e => e.net));
+        const shifts = [];
+        entries.forEach(e => {
+          const prevHcp = getHandicap(e.member);
+          e.member.games += 1;
+          e.member.totalPins += e.scratch;
+          if (e.scratch > e.member.highGame) e.member.highGame = e.scratch;
+          e.member.history.push(e.scratch);
+          if (e.member.history.length > 10) e.member.history.shift();
+          if (e.net === maxNet) e.member.wins += 1;
+          else e.member.losses += 1;
+          const newHcp = getHandicap(e.member);
+          shifts.push({ name: e.member.name, prevHcp, newHcp, delta: newHcp - prevHcp });
+        });
+        state.lastHcpShifts = shifts;
+
+        const awardStar = (catId, key, posOnly = true) => {
+          const best = Math.max(...entries.map(e => e[key]));
+          if (posOnly && best <= 0) return null;
+          const winner = entries.find(e => e[key] === best);
+          if (!winner) return null;
+          if (!winner.member.wedges) winner.member.wedges = { overall: 0, strikes: 0, gutters: 0, splits: 0, spares: 0 };
+          winner.member.wedges[catId] = Math.min(5, (winner.member.wedges[catId] || 0) + 1);
+          return winner.member.name;
+        };
+
+        const champ = awardStar('overall', 'net', false);
+        if (champ) state.reigningChamp = champ;
+        awardStar('strikes', 'strikes', true);
+        awardStar('gutters', 'gutters', true);
+        awardStar('splits', 'splits', true);
+        awardStar('spares', 'spares', true);
+
+        state.sessionLogs.unshift({
+          date: state.selectedDateId,
+          game: getActiveGame().name,
+          summary: entries.map(e => `${e.member.name}: ${e.scratch} (${e.net} net)`).join(' · ') + ` — Champ: ${champ || 'TBD'}`
+        });
+
+        // Record Doubles Team raw score & team handicap when playing doubles
+        const teamSheetRows = [];
+        if (getActiveGame().mode === 'doubles' && state.matchups.length > 0) {
+          if (!state.teamStats) state.teamStats = {};
+          const entryById = Object.fromEntries(entries.map(e => [e.member.id, e]));
+          const teamResults = state.matchups.filter(t => t.playerIds.length === 2).map(t => {
+            const p1 = state.members.find(x => x.id === t.playerIds[0]);
+            const p2 = state.members.find(x => x.id === t.playerIds[1]);
+            const e1 = entryById[t.playerIds[0]];
+            const e2 = entryById[t.playerIds[1]];
+            const rawTeam = Math.round(((e1 ? e1.scratch : 0) + (e2 ? e2.scratch : 0)) / 2);
+            const tHcp = getTeamHandicap(p1, p2);
+            const namesSorted = [p1.name, p2.name].sort().join(' & ');
+            return { key: getTeamKey(p1.id, p2.id), label: namesSorted, rawTeam, tHcp, netTeam: rawTeam + tHcp };
+          });
+          const bestTeamNet = teamResults.length ? Math.max(...teamResults.map(r => r.netTeam)) : 0;
+          teamResults.forEach((tr, idx) => {
+            const opp = teamResults[(idx + 1) % teamResults.length];
+            const won = tr.netTeam === bestTeamNet;
+            if (!state.teamStats[tr.key]) {
+              state.teamStats[tr.key] = { label: tr.label, games: 0, totalPins: 0, highGame: 0, wins: 0, losses: 0, history: [] };
+            }
+            const ts = state.teamStats[tr.key];
+            ts.games += 1;
+            ts.totalPins += tr.rawTeam;
+            if (tr.rawTeam > ts.highGame) ts.highGame = tr.rawTeam;
+            if (won) ts.wins += 1; else ts.losses += 1;
+            ts.history.push(tr.rawTeam);
+            if (ts.history.length > 10) ts.history.shift();
+            teamSheetRows.push({
+              date: state.selectedDateId,
+              gameStyle: getActiveGame().short,
+              teamPair: tr.label,
+              opponent: opp && opp.key !== tr.key ? opp.label : 'Field',
+              rawTeam: tr.rawTeam,
+              teamHcp: tr.tHcp,
+              won,
+              notes: ''
+            });
+          });
+        }
+
+        if (HAS_APPS_SCRIPT) {
+          const sheetRows = entries.map(e => ({
+            date: state.selectedDateId,
+            gameNum: 1,
+            gameStyle: getActiveGame().short,
+            bowler: e.member.name,
+            partner: '',
+            scratch: e.scratch,
+            handicap: getHandicap(e.member),
+            strikes: e.strikes,
+            spares: e.spares,
+            gutters: e.gutters,
+            splits: e.splits,
+            isWinner: e.member.name === champ,
+            notes: ''
+          }));
+          google.script.run.appendGameLogRows(sheetRows);
+          if (teamSheetRows.length > 0) {
+            google.script.run.appendTeamMatchRows(teamSheetRows);
+          }
+        }
+
+        state.liveScores = {};
+        state.playFrameIdx = 0;
+        state.currentBall = 0;
+        state.skippedIds = [];
+        state.pendingReturnCheckId = null;
+        generateMatchups(false); // Immediately rebalance pairings using new handicaps
+        saveState();
+        switchScreen('standings');
+        showToast(`Game saved! Handicaps recalculated & next pairings balanced. Champ: ${champ || 'TBD'}`);
+      });
+
+      // Challenges shuffle
+      document.getElementById('shuffleChallengesBtn').addEventListener('click', () => {
+        const shuffled = [...CHALLENGE_POOL].sort(() => Math.random() - 0.5);
+        state.members.forEach((m, i) => { m.challenge = shuffled[i % shuffled.length]; });
+        saveState();
+        renderGamesScreen();
+        showToast('New individual challenges dealt!');
+      });
+
+      // Player Profile nav
+      document.getElementById('backFromPlayerBtn').addEventListener('click', () => switchScreen(state.prevScreen || 'standings'));
+      document.getElementById('jumpToBowlBtn').addEventListener('click', () => {
+        state.activeBowlerId = state.viewingPlayerId;
+        switchScreen('play');
+      });
+
+      // Private Budget listeners
+      document.getElementById('budgetCapInput').addEventListener('change', e => {
+        state.privateBudget.monthlyCap = Math.max(0, Number(e.target.value) || 0);
+        saveState();
+        renderBudgetScreen();
+      });
+      document.getElementById('addExpenseBtn').addEventListener('click', () => {
+        const date = document.getElementById('expDate').value || new Date().toISOString().slice(0, 10);
+        const desc = document.getElementById('expDesc').value.trim();
+        const amount = Number(document.getElementById('expAmount').value);
+        if (!desc || !amount) { showToast('Enter a description and amount.'); return; }
+        state.privateBudget.expenses.unshift({ id: 'e_' + Date.now(), date, desc, amount });
+        document.getElementById('expDesc').value = '';
+        document.getElementById('expAmount').value = '';
+        saveState();
+        renderBudgetScreen();
+      });
+      document.getElementById('budgetExpensesList').addEventListener('click', e => {
+        const btn = e.target.closest('[data-del-exp]');
+        if (!btn) return;
+        const id = btn.getAttribute('data-del-exp');
+        state.privateBudget.expenses = state.privateBudget.expenses.filter(x => x.id !== id);
+        saveState();
+        renderBudgetScreen();
+      });
+
+      // Backup / Restore / Reset
+      document.getElementById('exportBtn').addEventListener('click', () => {
+        const json = JSON.stringify(state, null, 2);
+        openModal({
+          title: 'Backup Dashboard Data',
+          body: 'Copy this JSON to save or transfer your bowling dashboard data.',
+          confirmLabel: 'Copy JSON',
+          contentHtml: `<textarea id="backupTa" rows="6" class="w-full rounded-lg border border-slate-700 bg-slate-950 p-2 text-xs text-slate-200">${json}</textarea>`,
+          onConfirm: () => {
+            const ta = document.getElementById('backupTa');
+            ta.select();
+            try { document.execCommand('copy'); } catch (e) {}
+            showToast('Backup JSON copied!');
+          }
+        });
+      });
+      document.getElementById('importBtn').addEventListener('click', () => {
+        openModal({
+          title: 'Restore Dashboard Data',
+          body: 'Paste previously exported JSON below.',
+          confirmLabel: 'Restore',
+          contentHtml: `<textarea id="restoreTa" rows="6" class="w-full rounded-lg border border-slate-700 bg-slate-950 p-2 text-xs text-slate-200" placeholder="Paste JSON..."></textarea>`,
+          onConfirm: () => {
+            try {
+              const parsed = JSON.parse(document.getElementById('restoreTa').value);
+              if (parsed && Array.isArray(parsed.members)) {
+                state = parsed;
+                saveState();
+                renderAll();
+                showToast('Data restored!');
+              } else { showToast('Invalid JSON.'); return false; }
+            } catch (err) { showToast('Could not parse JSON.'); return false; }
+          }
+        });
+      });
+      document.getElementById('resetBtn').addEventListener('click', () => {
+        openModal({
+          title: 'Reset Dashboard?',
+          body: 'This resets sample standings, RSVPs, and game logs.',
+          confirmLabel: 'Reset',
+          onConfirm: () => {
+            state = createDefaultState();
+            generateMatchups(false);
+            saveState();
+            renderAll();
+            showToast('Dashboard reset.');
+          }
+        });
+      });
+
+      // Auto-sign-in via personalized URL parameter (?player=paul or #player=paul)
+      function applyPlayerUrlParam() {
+        let p = '';
+        if (SERVER_PLAYER_PARAM && !SERVER_PLAYER_PARAM.startsWith('<?=')) {
+          p = SERVER_PLAYER_PARAM.trim().toLowerCase();
+        }
+        if (!p) {
+          try {
+            const qs = new URLSearchParams(window.location.search);
+            p = (qs.get('player') || '').trim().toLowerCase();
+          } catch (e) {}
+        }
+        if (!p && window.location.hash && window.location.hash.includes('player=')) {
+          p = decodeURIComponent(window.location.hash.split('player=')[1].split('&')[0]).trim().toLowerCase();
+        }
+        if (p) {
+          const match = state.members.find(m => m.id.toLowerCase() === p || m.name.toLowerCase() === p);
+          if (match) {
+            state.signedInMemberId = match.id;
+          }
+        }
+      }
+
+      // Boot
+      applyPlayerUrlParam();
+      if (!state.matchups || state.matchups.length === 0) generateMatchups(false);
+      renderAll();
+      if (HAS_APPS_SCRIPT) {
+        setSyncPill('Connecting…', 'border-amber-500/40 bg-amber-500/10 text-amber-300');
+        pollLiveState();
+        setInterval(pollLiveState, 3000);
+      }
+    })();
+  </script>
+</body>
+</html>
